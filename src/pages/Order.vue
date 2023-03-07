@@ -31,7 +31,13 @@
 
             <q-space />
 
-            <q-btn
+            <q-btn @click="exportdata=true" dense flat text-color="blue-7" icon="document_scanner" class="q-mr-md">
+              <q-tooltip>
+                Export Data
+              </q-tooltip>
+            </q-btn>
+
+            <!-- <q-btn
               flat
               icon-right="document_scanner"
               text-color="blue-7"
@@ -40,7 +46,7 @@
               <q-tooltip>
                 Export Data
               </q-tooltip>
-            </q-btn>
+            </q-btn> -->
 
             <q-btn
               flat
@@ -114,6 +120,48 @@
       </q-card>
     </div>
 
+    <q-dialog v-model="exportdata">
+      <q-card class="my-card" flat bordered style="width: 600px; max-width: 60vw;">
+        <q-item>
+          <q-item-section avatar>
+              <q-icon name="document_scanner" size="30px" color="blue-7" />
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label>Data Export</q-item-label>
+            <q-item-label caption>
+              Export data ke format excel
+            </q-item-label>
+          </q-item-section>
+
+          <q-item-section class="col-1">
+            <q-btn flat dense icon="close" class="float-right" color="grey-8" v-close-popup></q-btn>
+          </q-item-section>
+        </q-item>
+
+        <q-separator />
+
+        <q-form
+          @submit="exportData(dataUser.user.guid)">
+          <q-card-section horizontal>
+            <q-card-section class="q-gutter-md fit">
+              <q-input type="date" dense outlined v-model="range_start" hint="Dari tanggal"/>
+            </q-card-section>
+            <q-separator vertical />
+            <q-card-section class="q-gutter-md fit">
+              <q-input type="date" dense outlined v-model="range_end" hint="Sampai tanggal"/>
+            </q-card-section>
+          </q-card-section>
+          <q-separator />
+          <q-card-actions>
+            <q-btn type="submit" flat color="primary">
+              Export
+            </q-btn>
+          </q-card-actions>
+        </q-form>
+      </q-card>
+    </q-dialog>
+
   </q-page>
 </template>
 
@@ -161,7 +209,10 @@ export default {
       mode: 'list',
       pagination: {
         rowsPerPage: 50
-      }
+      },
+      exportdata: false,
+      range_start: null,
+      range_end: null
     }
   },
   created () {
