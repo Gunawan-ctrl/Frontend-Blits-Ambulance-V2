@@ -420,7 +420,6 @@ export default {
               return item.verifikasi === 0
             })
             this.totalnotif = totalnotif.length
-            console.log(this.totalnotif)
           }
         })
     },

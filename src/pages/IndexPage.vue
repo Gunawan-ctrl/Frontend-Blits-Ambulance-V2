@@ -50,10 +50,10 @@
           </q-slide-transition>
         </template>
         <template v-slot:body="props">
-          <q-tr :props="props" v-if="props.row.verifikasi == 0 && props.row.role == '2'">
+          <q-tr :props="props" v-if="props.row.verifikasi == 0">
             <q-td key="fullname">
               {{ props.row.fullname }}
-              <q-badge v-if="props.row.role === '2'" :color="props.row.verifikasi === 0 ? 'orange' :props.row.role === '3' ? 'red' : 'primari'">
+              <q-badge color="warning">
                 {{ props.row.verifikasi === 0 ? 'unverified' : 'verified' }}
               </q-badge>
             </q-td>
@@ -349,7 +349,7 @@ export default {
       filter: '',
       data: [],
       pagination: {
-        rowsPerPage: 50
+        rowsPerPage: 10
       },
       map: {
         loaded: false,
@@ -384,10 +384,6 @@ export default {
       yourMessage: 'user telah diverifikasi'
     }
   },
-  // beforeCreate (number, message) {
-  //   this.number = yourNumber,
-  // message = yourMessage.split(' ').join('%20')
-  // },
   async created () {
     await this.getKendaraan()
     await this.getDriver()
@@ -423,7 +419,7 @@ export default {
         }
       }).finally(() => this.$q.loading.hide())
         .then((res) => {
-          if (res.status === 200) {
+          if (res.data.status) {
             this.jumlah = res.data.data.length
             res.data.data.forEach((marker) => {
               marker.location_latitude = marker.location.coordinates[1]
@@ -446,7 +442,9 @@ export default {
       this.$axios.get('drivers/get-driver', createToken())
         .finally(() => this.$q.loading.hide())
         .then((res) => {
-          this.pengemudi = res.data.data.length
+          if (res.data.status) {
+            this.pengemudi = res.data.data.length
+          }
         })
     },
     getPesanan () {
@@ -454,16 +452,19 @@ export default {
       this.$axios.get('pesanan/get-pesanan', createToken())
         .finally(() => this.$q.loading.hide())
         .then((res) => {
-          this.pesanan = res.data.data.length
+          if (res.data.status) {
+            this.pesanan = res.data.data.length
+          }
         })
     },
     getCustomers () {
       this.$q.loading.show()
-      this.$axios.get('users/get/all', createToken())
+      this.$axios.get('users/get/role-user', createToken())
         .finally(() => this.$q.loading.hide())
         .then((res) => {
           if (res.data.status) {
             this.data = res.data.data
+            console.log(this.data)
           }
         })
     },

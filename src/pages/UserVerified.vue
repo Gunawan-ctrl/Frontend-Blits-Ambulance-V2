@@ -10,7 +10,7 @@
     <div class="col q-col-gutter-md q-ma-md q-mt-lg">
       <q-card>
         <q-table
-          :rows="usersVerified"
+          :rows="data"
           :hide-header="mode === 'grid'"
           :columns="columns"
           row-key="name"
@@ -76,7 +76,8 @@
                 {{ props.row.no_telpon }}
               </q-td>
               <q-td class="text-bold" key="status" :props="props">
-                <q-badge color="green"><q-icon name="verified" size="14px" class="q-mr-xs"/> Verified</q-badge>
+                <q-badge color="green">
+                  <q-icon name="verified" size="14px" class="q-mr-xs"/> Verified</q-badge>
               </q-td>
             </q-tr>
           </template>
@@ -88,18 +89,13 @@
 <script>
 import { exportFile } from 'quasar'
 import createToken from 'src/boot/create_token'
-
 function wrapCsvValue (val, formatFn) {
   let formatted = formatFn !== void 0 ? formatFn(val) : val
-
   formatted =
       formatted === void 0 || formatted === null ? '' : String(formatted)
-
   formatted = formatted.split('"').join('""')
-
   return `"${formatted}"`
 }
-
 const columns = [
   { name: 'fullname', label: 'Nama Lengkap', field: 'fullname', sortable: true, align: 'left' },
   { name: 'email', label: 'Email', field: 'email', sortable: true, align: 'center' },
@@ -107,11 +103,14 @@ const columns = [
   { name: 'status', label: 'status', field: 'status', sortable: true, align: 'center', class: 'text-bold' }
 ]
 
+const data = []
+
 export default {
   data () {
     return {
       visibles: false,
-      data: [],
+      data,
+      rows: [],
       verified: '',
       usersVerified: [],
       columns,
@@ -119,7 +118,7 @@ export default {
       mode: 'list',
       verifikasi: '',
       pagination: {
-        rowsPerPage: 50
+        rowsPerPage: 10
       }
     }
   },
@@ -129,11 +128,11 @@ export default {
   methods: {
     async getCustomers () {
       this.$q.loading.show()
-      this.$axios.get('users/get/all', createToken())
+      this.$axios.get('users/get/role-user', createToken())
         .finally(() => this.$q.loading.hide())
         .then((res) => {
           if (res.data.status) {
-            this.usersVerified = res.data.data
+            this.data = res.data.data
           }
         })
     }
@@ -155,9 +154,7 @@ export default {
         )
       )
       .join('\r\n')
-
     const status = exportFile('user-verified.csv', content, 'text/csv')
-
     if (status !== true) {
       this.$q.notify({
         message: 'Browser denied file download...',
@@ -167,5 +164,4 @@ export default {
     }
   }
 }
-
 </script>
