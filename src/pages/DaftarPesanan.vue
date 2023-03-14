@@ -2,17 +2,61 @@
 <template>
   <q-page>
     <q-card class="q-pa-md q-ma-md">
-        <q-breadcrumbs>
-          <q-breadcrumbs-el label="Home" icon="home" />
-          <q-breadcrumbs-el label="Pesanan masuk" icon="perm_phone_msg" />
-          <q-breadcrumbs-el class="text-grey-7" label="Daftar pesanan" icon="playlist_add_check_circle" />
-        </q-breadcrumbs>
+      <q-breadcrumbs>
+        <q-breadcrumbs-el label="Home" icon="home" />
+        <q-breadcrumbs-el label="Pesanan masuk" icon="perm_phone_msg" />
+        <q-breadcrumbs-el class="text-grey-7" label="Daftar pesanan" icon="playlist_add_check_circle" />
+      </q-breadcrumbs>
+    </q-card>
+    <q-card class="q-px-md q-mx-md">
+      <q-form @submit="lihat()">
+        <q-card-section>
+          <div class="row q-col-gutter-lg">
+            <div class="col-md-4 col-sm-6 col-xs-12">
+              <q-input
+                type="date"
+                hint="Tanggal Mulai"
+                v-model="startDate"
+                mask="date"
+                outlined
+                dense
+              >
+              </q-input>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+              <q-input
+                type="date"
+                hint="Tanggal Selesai"
+                v-model="endDate"
+                mask="date"
+                outlined
+                dense
+              >
+              </q-input>
+            </div>
+            <div class="col-md-4 col-sm-6 col-xs-12">
+              <q-select
+                hint="Status Pesanan"
+                key="value"
+                v-model="status_pesanan"
+                :options="options"
+                outlined
+                dense
+              >
+              </q-select>
+            </div>
+            <div>
+              <q-btn size="md" outline class="full-width" color="blue-7" icon="visibility" @click="lihat" label="lihat data" />
+            </div>
+          </div>
+        </q-card-section>
+      </q-form>
     </q-card>
     <div class="col q-col-gutter-md q-ma-md q-mt-lg">
       <q-card>
         <q-table
-          :rows="data"
           class="text-grey-7"
+          :rows="data"
           :hide-header="mode === 'grid'"
           :columns="columns"
           row-key="name"
@@ -34,10 +78,10 @@
 
             <q-btn
               flat
-              icon-right="document_scanner"
+              unelevated
+              icon="document_scanner"
               text-color="blue-7"
-              @click="exportTable"
-            >
+              @click="exportToCSV()">
               <q-tooltip>
                 Export Data
               </q-tooltip>
@@ -95,17 +139,6 @@
 import { exportFile } from 'quasar'
 import createToken from 'src/boot/create_token'
 
-function wrapCsvValue (val, formatFn) {
-  let formatted = formatFn !== void 0 ? formatFn(val) : val
-
-  formatted =
-      formatted === void 0 || formatted === null ? '' : String(formatted)
-
-  formatted = formatted.split('"').join('""')
-
-  return `"${formatted}"`
-}
-
 const columns = [
   { name: 'nama_driver', align: 'left', label: 'DRIVER', field: 'nama_driver', sortable: true },
   { name: 'no_telpon', align: 'left', label: 'NO. HP', field: 'no_telpon', sortable: true },
@@ -122,6 +155,20 @@ const columns = [
 export default {
   data () {
     return {
+      options: [
+        {
+          label: 'Menunggu',
+          value: 1
+        },
+        {
+          label: 'Menjemput',
+          value: 2
+        },
+        {
+          label: 'Selesai',
+          value: 3
+        }
+      ],
       visibles: false,
       columns,
       data: [],
@@ -134,6 +181,8 @@ export default {
       drivers: '',
       guid: '',
       filter: '',
+      startDate: null,
+      endDate: null,
       mode: 'list',
       pagination: {
         rowsPerPage: 10
@@ -160,27 +209,33 @@ export default {
           }
         })
     },
-    exportTable () {
-      // naive encoding to csv format
-      const content = [this.columns.map(col => wrapCsvValue(col.label))]
+    lihat () {
+      this.$axios.get('pesanan/getpesananbydate/', {
+        params: {
+          startDate: this.startDate,
+          endDate: this.endDate,
+          status_pesanan: this.status_pesanan
+        },
+        headers: createToken().headers
+      })
+        // .finally(() => this.$q.loading.hide())
+        .then((res) => {
+          if (res.data.status) {
+            this.data = res.data.data
+          }
+        })
+    },
+    exportToCSV () {
+      const content = ['Driver; No Telpon; No Plat; Status; Pemesan; No Hp; Jemput; Tujuan; Tanggal Pemesanan']
         .concat(
-          this.data.map(row =>
-            this.columns
-              .map(col =>
-                wrapCsvValue(
-                  typeof col.field === 'function'
-                    ? col.field(row)
-                    : row[col.field === void 0 ? col.name : col.field],
-                  col.format
-                )
-              )
-              .join(',')
-          )
+          this.data.map((row) => {
+            return `${row.data_driver.nama_driver};${
+              row.data_driver.no_telpon
+            };${row.data_driver.no_plat};${row.status_pesanan};${row.data_user.fullname};${row.data_user.no_telpon};${row.titik_jemput};${row.tujuan};${row.created_at};`
+          })
         )
         .join('\r\n')
-
-      const status = exportFile('daftar-pesanan.csv', content, 'text/csv')
-
+      const status = exportFile('daftar pesanan.csv', content, 'text/csv')
       if (status !== true) {
         this.$q.notify({
           message: 'Browser denied file download...',

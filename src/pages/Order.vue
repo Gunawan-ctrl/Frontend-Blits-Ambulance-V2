@@ -30,23 +30,16 @@
             </div>
 
             <q-space />
-
-            <q-btn @click="exportdata=true" dense flat text-color="blue-7" icon="document_scanner" class="q-mr-md">
+            <q-btn
+              flat
+              unelevated
+              icon="document_scanner"
+              text-color="blue-7"
+              @click="exportToCSV()">
               <q-tooltip>
                 Export Data
               </q-tooltip>
             </q-btn>
-
-            <!-- <q-btn
-              flat
-              icon-right="document_scanner"
-              text-color="blue-7"
-              @click="exportTable"
-            >
-              <q-tooltip>
-                Export Data
-              </q-tooltip>
-            </q-btn> -->
 
             <q-btn
               flat
@@ -119,66 +112,12 @@
         </q-table>
       </q-card>
     </div>
-
-    <q-dialog v-model="exportdata">
-      <q-card class="my-card" flat bordered style="width: 600px; max-width: 60vw;">
-        <q-item>
-          <q-item-section avatar>
-              <q-icon name="document_scanner" size="30px" color="blue-7" />
-          </q-item-section>
-
-          <q-item-section>
-            <q-item-label>Data Export</q-item-label>
-            <q-item-label caption>
-              Export data ke format excel
-            </q-item-label>
-          </q-item-section>
-
-          <q-item-section class="col-1">
-            <q-btn flat dense icon="close" class="float-right" color="grey-8" v-close-popup></q-btn>
-          </q-item-section>
-        </q-item>
-
-        <q-separator />
-
-        <q-form
-          @submit="exportData(dataUser.user.guid)">
-          <q-card-section horizontal>
-            <q-card-section class="q-gutter-md fit">
-              <q-input type="date" dense outlined v-model="range_start" hint="Dari tanggal"/>
-            </q-card-section>
-            <q-separator vertical />
-            <q-card-section class="q-gutter-md fit">
-              <q-input type="date" dense outlined v-model="range_end" hint="Sampai tanggal"/>
-            </q-card-section>
-          </q-card-section>
-          <q-separator />
-          <q-card-actions>
-            <q-btn type="submit" flat color="primary">
-              Export
-            </q-btn>
-          </q-card-actions>
-        </q-form>
-      </q-card>
-    </q-dialog>
-
   </q-page>
 </template>
 
 <script>
 import { exportFile } from 'quasar'
 import createToken from 'src/boot/create_token'
-
-function wrapCsvValue (val, formatFn) {
-  let formatted = formatFn !== void 0 ? formatFn(val) : val
-
-  formatted =
-      formatted === void 0 || formatted === null ? '' : String(formatted)
-
-  formatted = formatted.split('"').join('""')
-
-  return `"${formatted}"`
-}
 
 const columns = [
   { name: 'kode_pesanan', align: 'left', label: 'KODE', field: 'kode_pesanan', sortable: true },
@@ -196,6 +135,7 @@ const data = []
 export default {
   data () {
     return {
+      ico: '',
       visibles: false,
       columns,
       data,
@@ -209,10 +149,7 @@ export default {
       mode: 'list',
       pagination: {
         rowsPerPage: 50
-      },
-      exportdata: false,
-      range_start: null,
-      range_end: null
+      }
     }
   },
   created () {
@@ -236,27 +173,15 @@ export default {
     Drivers (guid) {
       this.$router.push('/pilih-drivers/' + guid)
     },
-    exportTable () {
-      // naive encoding to csv format
-      const content = [this.columns.map(col => wrapCsvValue(col.label))]
+    exportToCSV () {
+      const content = ['Kode Pesanan; Nama Pemesan; No Telpon; Titik Jemput; Tujuan; Tanggal Pemesanan; Status Pemesanan;']
         .concat(
-          this.data.map(row =>
-            this.columns
-              .map(col =>
-                wrapCsvValue(
-                  typeof col.field === 'function'
-                    ? col.field(row)
-                    : row[col.field === void 0 ? col.name : col.field],
-                  col.format
-                )
-              )
-              .join(',')
-          )
+          this.data.map((row) => {
+            return `${row.kode_pesanan};${row.data_user.fullname};${row.data_user.no_telpon};${row.titik_jemput};${row.tujuan};${row.created_at};${row.status_pesanan};`
+          })
         )
         .join('\r\n')
-
-      const status = exportFile('pesanan-masuk.csv', content, 'text/csv')
-
+      const status = exportFile('daftar-pesanan-masuk.csv', content, 'text/csv')
       if (status !== true) {
         this.$q.notify({
           message: 'Browser denied file download...',

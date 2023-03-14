@@ -28,6 +28,7 @@ module.exports = configure(function (ctx) {
       'axios',
       'showNotif',
       'leaflet',
+      'GlobalVariables',
       ['google-maps']
     ],
     // module:exports = configure(function () {

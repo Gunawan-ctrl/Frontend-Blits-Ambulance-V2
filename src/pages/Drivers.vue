@@ -7,8 +7,41 @@
         <q-breadcrumbs-el class="text-grey-7" label="Pengemudi" icon="supervised_user_circle" />
       </q-breadcrumbs>
     </q-card>
+    <q-card class="q-px-md q-mx-md">
+      <q-form @submit="lihat()">
+        <q-card-section>
+          <div class="row q-col-gutter-lg">
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <q-input
+                type="date"
+                hint="Tanggal Mulai"
+                v-model="startDate"
+                mask="date"
+                outlined
+                dense
+              >
+              </q-input>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <q-input
+                type="date"
+                hint="Tanggal Selesai"
+                v-model="endDate"
+                mask="date"
+                outlined
+                dense
+              >
+              </q-input>
+            </div>
+            <div>
+              <q-btn size="md" outline class="full-width" color="blue-7" icon="visibility" @click="lihat" label="lihat data" />
+            </div>
+          </div>
+        </q-card-section>
+      </q-form>
+    </q-card>
 
-    <div class="col q-col-gutter-md q-ma-md q-mt-lg">
+    <div class="col q-col-gutter-md q-ma-md">
       <q-card>
         <q-table
           :rows="data"
@@ -39,10 +72,10 @@
 
             <q-btn
               flat
-              icon-right="document_scanner"
+              unelevated
+              icon="document_scanner"
               text-color="blue-7"
-              @click="exportTable"
-            >
+              @click="exportToCSV()">
               <q-tooltip>
                 Export Data
               </q-tooltip>
@@ -70,9 +103,34 @@
               </div>
             </q-slide-transition>
           </template>
-          <template v-slot:body-cell-status_driver="props">
-            <q-td :props="props">
-              <q-badge
+          <template v-slot:body="props">
+            <q-tr :props="props">
+              <q-td key="tanggal" :props="props">
+                {{ $parseDate(props.row.created_at).fullDate }}
+              </q-td>
+              <q-td key="nama_driver" :props="props">
+                {{ props.row.nama_driver }}
+              </q-td>
+              <q-td key="email" :props="props">
+                {{ props.row.data_user.email }}
+              </q-td>
+              <q-td key="no_telpon" :props="props">
+                {{ props.row.no_telpon }}
+              </q-td>
+              <q-td key="no_plat" :props="props">
+                {{ props.row.no_plat }}
+              </q-td>
+              <q-td key="alamat" :props="props">
+                {{ props.row.alamat }}
+              </q-td>
+              <q-td key="instansi_code" :props="props">
+                {{ props.row.data_user.instansi_code }}
+              </q-td>
+              <q-td key="app_code" :props="props">
+                {{ props.row.data_user.app_code }}
+              </q-td>
+              <q-td key="status_driver" :props="props">
+                <q-badge
                 :color="(props.row.status_driver === 0) ?'green'
                 :(props.row.status_driver === 1 ?'red':'red')"
                 text-color="white"
@@ -81,7 +139,8 @@
                 square>
                 {{ props.row.status_driver === 0 ? 'AKTIF' : 'TIDAK AKTIF' }}
               </q-badge>
-            </q-td>
+              </q-td>
+            </q-tr>
           </template>
         </q-table>
       </q-card>
@@ -172,77 +231,63 @@
 import { exportFile } from 'quasar'
 import createToken from 'src/boot/create_token'
 
-function wrapCsvValue (val, formatFn) {
-  let formatted = formatFn !== void 0 ? formatFn(val) : val
-
-  formatted =
-      formatted === void 0 || formatted === null ? '' : String(formatted)
-
-  formatted = formatted.split('"').join('""')
-
-  return `"${formatted}"`
-}
-
 const columns = [
   {
+    name: 'tanggal',
+    label: 'TANGGAL',
+    field: 'tanggal',
+    align: 'left'
+  },
+  {
     name: 'nama_driver',
-    align: 'left',
     label: 'NAMA PENGEMUDI',
     field: 'nama_driver',
-    sortable: true
+    align: 'left'
   },
   {
     name: 'email',
-    required: true,
-    label: 'EMAIL',
     class: 'text-capitalized',
-    align: 'left',
+    label: 'EMAIL',
     field: row => row.data_user.email,
-    sortable: true
+    align: 'left'
   },
   {
     name: 'no_telpon',
     required: true,
     label: 'NO TELPON',
-    align: 'left',
     field: row => row.no_telpon,
-    sortable: true
+    align: 'left'
   },
   {
     name: 'no_plat',
     required: true,
     label: 'NO PLAT',
-    align: 'left',
     field: row => row.no_plat,
-    sortable: true
+    align: 'left'
   },
   {
     name: 'alamat',
-    align: 'left',
     label: 'ALAMAT',
     field: 'alamat',
-    sortable: true
+    align: 'left'
   },
   {
     name: 'instansi_code',
-    align: 'left',
     label: 'INSTANSI KODE',
     field: row => row.data_user.instansi_code,
-    sortable: true
+    align: 'left'
   },
   {
     name: 'app_code',
-    align: 'left',
     label: 'APP KODE',
     field: row => row.data_user.app_code,
-    sortable: true
+    align: 'left'
   },
   {
     name: 'status_driver',
-    align: 'left',
     label: 'STATUS DRIVER',
     field: 'status_driver',
-    sortable: true
+    align: 'center'
   }
 ]
 const data = []
@@ -263,6 +308,7 @@ export default {
       alamat: null,
       columns,
       no_telpon: null,
+      created_at: null,
       email: null,
       status: null,
       optionStatus: [
@@ -282,24 +328,59 @@ export default {
       mode: 'list',
       pagination: {
         rowsPerPage: 10
-      }
+      },
+      startDate: null,
+      endDate: null
     }
   },
   created () {
-    this.getDriver()
+    this.getData()
     this.getKendaraan()
   },
   methods: {
-    getDriver () {
-      this.$q.loading.show()
-      this.$axios.get('drivers/get-driver', createToken())
-        .finally(() => this.$q.loading.hide())
+    getData () {
+      this.onRequest({
+        pagination: this.pagination,
+        filter: this.nama
+      })
+    },
+    exportToCSV () {
+      const content = ['Nama Pengemudi; Email; No Telpon; No Plat; Alamat']
+        .concat(
+          this.data.map((row) => {
+            return `${row.nama_driver};${
+              row.data_user.email
+            };${row.no_telpon};${row.no_plat};${row.alamat}`
+          })
+        )
+        .join('\r\n')
+      const status = exportFile('daftar pengemudi.csv', content, 'text/csv')
+      if (status !== true) {
+        this.$q.notify({
+          message: 'Browser denied file download...',
+          color: 'negative',
+          icon: 'warning'
+        })
+      }
+    },
+    onRequest () {
+      this.lihat()
+    },
+    lihat () {
+      // this.$q.loading.show()
+      this.$axios.get('drivers/getdriverbydate/', {
+        params: {
+          startDate: this.startDate,
+          endDate: this.endDate
+        },
+        headers: createToken().headers
+      })
+        // .finally(() => this.$q.loading.hide())
         .then((res) => {
           if (res.data.status) {
             this.data = res.data.data
-            console.log(this.data)
           }
-        }).catch(() => this.$commonErrorNotif())
+        })
     },
     getKendaraan () {
       this.$axios.post('https://api-kopamas-carter.pptik.id:5121/api.v1/vehicles/po-get', {
@@ -348,42 +429,7 @@ export default {
           this.$errorServer()
         }
       })
-    },
-    exportTable () {
-      // naive encoding to csv format
-      const content = [this.columns.map(col => wrapCsvValue(col.label))]
-        .concat(
-          this.data.map(row =>
-            this.columns
-              .map(col =>
-                wrapCsvValue(
-                  typeof col.field === 'function'
-                    ? col.field(row)
-                    : row[col.field === void 0 ? col.name : col.field],
-                  col.format
-                )
-              )
-              .join(',')
-          )
-        )
-        .join('\r\n')
-
-      const status = exportFile('daftar-drivers.csv', content, 'text/csv')
-
-      if (status !== true) {
-        this.$q.notify({
-          message: 'Browser denied file download...',
-          color: 'negative',
-          icon: 'warning'
-        })
-      }
     }
   }
 }
 </script>
-<style>
-  .q-chip__content {
-    display: block;
-    text-align: center;
-  }
-</style>

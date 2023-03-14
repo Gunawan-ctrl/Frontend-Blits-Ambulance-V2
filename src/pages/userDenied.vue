@@ -7,6 +7,40 @@
       </q-breadcrumbs>
     </q-card>
 
+    <q-card class="q-px-md q-mx-md">
+      <q-form @submit="lihatData()">
+        <q-card-section>
+          <div class="row q-col-gutter-lg">
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <q-input
+                type="date"
+                hint="Tanggal Mulai"
+                v-model="startDate"
+                mask="date"
+                outlined
+                dense
+              >
+              </q-input>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <q-input
+                type="date"
+                hint="Tanggal Selesai"
+                v-model="endDate"
+                mask="date"
+                outlined
+                dense
+              >
+              </q-input>
+            </div>
+            <div>
+              <q-btn size="md" outline class="full-width" color="blue-7" icon="visibility" @click="lihatData" label="lihat data" />
+            </div>
+          </div>
+        </q-card-section>
+      </q-form>
+    </q-card>
+
     <div class="col q-col-gutter-md q-ma-md q-mt-lg">
       <q-card>
         <q-table
@@ -33,10 +67,10 @@
 
             <q-btn
               flat
-              icon-right="document_scanner"
+              unelevated
+              icon="document_scanner"
               text-color="blue-7"
-              @click="exportTable"
-            >
+              @click="exportToCSV()">
               <q-tooltip>
                 Export Data
               </q-tooltip>
@@ -65,7 +99,10 @@
             </q-slide-transition>
           </template>
           <template v-slot:body="props">
-            <q-tr class="text-uppercase" :props="props" v-if="props.row.verifikasi == 2 && props.row.role == 2">
+            <q-tr class="text-uppercase" :props="props" v-if="props.row.verifikasi === 2">
+              <q-td key="tanggal" :props="props">
+                {{ $parseDate(props.row.created_at).fullDate }}
+              </q-td>
               <q-td key="fullname" :props="props">
                 {{ props.row.fullname }}
               </q-td>
@@ -76,7 +113,8 @@
                 {{ props.row.no_telpon }}
               </q-td>
               <q-td class="text-bold" key="status" :props="props">
-                <q-badge color="red"><q-icon name="do_disturb" size="14px" class="q-mr-xs"/> Denied</q-badge>
+                <q-badge color="red">
+                  <q-icon name="do_disturb" size="14px" class="q-mr-xs"/> Denied</q-badge>
               </q-td>
             </q-tr>
           </template>
@@ -89,18 +127,8 @@
 import createToken from 'src/boot/create_token'
 import { exportFile } from 'quasar'
 
-function wrapCsvValue (val, formatFn) {
-  let formatted = formatFn !== void 0 ? formatFn(val) : val
-
-  formatted =
-      formatted === void 0 || formatted === null ? '' : String(formatted)
-
-  formatted = formatted.split('"').join('""')
-
-  return `"${formatted}"`
-}
-
 const columns = [
+  { name: 'tanggal', label: 'TANGGAL', field: 'tanggal', sortable: true, align: 'left' },
   { name: 'fullname', label: 'NAMA LENGKAP', field: 'fullname', sortable: true, align: 'left' },
   { name: 'email', label: 'EMAIL', field: 'email', sortable: true, align: 'center' },
   { name: 'no_telpon', label: 'NOMOR TELEPON', field: 'no_telpon', sortable: true, align: 'center', class: 'text-bold' },
@@ -115,12 +143,16 @@ export default {
       data: [],
       usersDenied: [],
       columns,
+      created_at: null,
       filter: '',
       initialPagination: {
         sortBy: 'desc',
         descending: false,
-        rowsPerPage: 50
-      }
+        rowsPerPage: 10
+      },
+      startDate: null,
+      endDate: null,
+      userverif: null
     }
   },
   async created () {
@@ -129,37 +161,47 @@ export default {
   methods: {
     async getCustomers () {
       this.$q.loading.show()
-      const response = await this.$axios.get('users/get/all', createToken()).finally(() => this.$q.loading.hide())
-      this.usersDenied = response.data.data
-    }
-  },
-  exportTable () {
-    // naive encoding to csv format
-    const content = [this.columns.map(col => wrapCsvValue(col.label))]
-      .concat(
-        this.data.map(row =>
-          this.columns
-            .map(col =>
-              wrapCsvValue(
-                typeof col.field === 'function'
-                  ? col.field(row)
-                  : row[col.field === void 0 ? col.name : col.field],
-                col.format
-              )
-            )
-            .join(',')
-        )
-      )
-      .join('\r\n')
-
-    const status = exportFile('user-verified.csv', content, 'text/csv')
-
-    if (status !== true) {
-      this.$q.notify({
-        message: 'Browser denied file download...',
-        color: 'negative',
-        icon: 'warning'
+      this.$axios.get('users/get/role-user', createToken())
+        .finally(() => this.$q.loading.hide())
+        .then((res) => {
+          if (res.data.status) {
+            this.usersDenied = res.data.data
+          }
+        })
+    },
+    lihatData () {
+      this.$axios.get('users/getuserbydate/', {
+        params: {
+          startDate: this.startDate,
+          endDate: this.endDate
+        },
+        headers: createToken().headers
       })
+      // .finally(() => this.$q.loading.hide())
+        .then((res) => {
+          if (res.data.status) {
+            this.data = res.data.data
+          }
+        })
+    },
+    exportToCSV () {
+      const content = ['Tanggal; Nama Lengkap; Email; No Telpon']
+        .concat(
+          this.usersDenied.map((row) => {
+            return `${row.created_at};${
+              row.fullname
+            };${row.email};${row.no_telpon};`
+          })
+        )
+        .join('\r\n')
+      const status = exportFile('daftar-pengguna-tertolak.csv', content, 'text/csv')
+      if (status !== true) {
+        this.$q.notify({
+          message: 'Browser denied file download...',
+          color: 'negative',
+          icon: 'warning'
+        })
+      }
     }
   }
 }

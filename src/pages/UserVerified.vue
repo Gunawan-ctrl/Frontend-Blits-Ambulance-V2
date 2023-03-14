@@ -6,6 +6,39 @@
         <q-breadcrumbs-el class="text-grey-7" label="Pengguna Terverifikasi" icon="verified" />
       </q-breadcrumbs>
     </q-card>
+    <q-card class="q-px-md q-mx-md">
+      <q-form @submit="lihatData()">
+        <q-card-section>
+          <div class="row q-col-gutter-lg">
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <q-input
+                type="date"
+                hint="Tanggal Mulai"
+                v-model="startDate"
+                mask="date"
+                outlined
+                dense
+              >
+              </q-input>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <q-input
+                type="date"
+                hint="Tanggal Selesai"
+                v-model="endDate"
+                mask="date"
+                outlined
+                dense
+              >
+              </q-input>
+            </div>
+            <div>
+              <q-btn size="md" outline class="full-width" color="blue-7" icon="visibility" @click="lihatData" label="lihat data" />
+            </div>
+          </div>
+        </q-card-section>
+      </q-form>
+    </q-card>
 
     <div class="col q-col-gutter-md q-ma-md q-mt-lg">
       <q-card>
@@ -33,10 +66,10 @@
 
             <q-btn
               flat
-              icon-right="document_scanner"
+              unelevated
+              icon="document_scanner"
               text-color="blue-7"
-              @click="exportTable"
-            >
+              @click="exportToCSV()">
               <q-tooltip>
                 Export Data
               </q-tooltip>
@@ -66,6 +99,9 @@
           </template>
           <template v-slot:body="props">
             <q-tr class="text-uppercase" :props="props" v-if="props.row.verifikasi == 1 && props.row.role == 2">
+              <q-td key="tanggal" :props="props">
+                {{ $parseDate(props.row.created_at).fullDate }}
+              </q-td>
               <q-td key="fullname" :props="props">
                 {{ props.row.fullname }}
               </q-td>
@@ -89,18 +125,13 @@
 <script>
 import { exportFile } from 'quasar'
 import createToken from 'src/boot/create_token'
-function wrapCsvValue (val, formatFn) {
-  let formatted = formatFn !== void 0 ? formatFn(val) : val
-  formatted =
-      formatted === void 0 || formatted === null ? '' : String(formatted)
-  formatted = formatted.split('"').join('""')
-  return `"${formatted}"`
-}
+
 const columns = [
-  { name: 'fullname', label: 'Nama Lengkap', field: 'fullname', sortable: true, align: 'left' },
-  { name: 'email', label: 'Email', field: 'email', sortable: true, align: 'center' },
-  { name: 'no_telpon', label: 'No. Telpon', field: 'no_telpon', sortable: true, align: 'center', class: 'text-bold' },
-  { name: 'status', label: 'status', field: 'status', sortable: true, align: 'center', class: 'text-bold' }
+  { name: 'tanggal', label: 'TANGGAL', field: 'tanggal', align: 'left' },
+  { name: 'fullname', label: 'Nama Lengkap', field: 'fullname', align: 'left' },
+  { name: 'email', label: 'Email', field: 'email', align: 'center' },
+  { name: 'no_telpon', label: 'No. Telpon', field: 'no_telpon', align: 'center', class: 'text-bold' },
+  { name: 'status', label: 'status', field: 'status', align: 'center', class: 'text-bold' }
 ]
 
 const data = []
@@ -115,11 +146,14 @@ export default {
       usersVerified: [],
       columns,
       filter: '',
+      created_at: null,
       mode: 'list',
       verifikasi: '',
       pagination: {
         rowsPerPage: 10
-      }
+      },
+      startDate: null,
+      endDate: null
     }
   },
   async created () {
@@ -135,32 +169,38 @@ export default {
             this.data = res.data.data
           }
         })
-    }
-  },
-  exportTable () {
-    const content = [this.columns.map(col => wrapCsvValue(col.label))]
-      .concat(
-        this.data.map(row =>
-          this.columns
-            .map(col =>
-              wrapCsvValue(
-                typeof col.field === 'function'
-                  ? col.field(row)
-                  : row[col.field === void 0 ? col.name : col.field],
-                col.format
-              )
-            )
-            .join(',')
-        )
-      )
-      .join('\r\n')
-    const status = exportFile('user-verified.csv', content, 'text/csv')
-    if (status !== true) {
-      this.$q.notify({
-        message: 'Browser denied file download...',
-        color: 'negative',
-        icon: 'warning'
+    },
+    lihatData () {
+      this.$axios.get('users/getuserbydate/', {
+        params: {
+          startDate: this.startDate,
+          endDate: this.endDate
+        },
+        headers: createToken().headers
       })
+      // .finally(() => this.$q.loading.hide())
+        .then((res) => {
+          if (res.data.status) {
+            this.data = res.data.data
+          }
+        })
+    },
+    exportToCSV () {
+      const content = ['Tanggal; Nama Lengkap; Email; No Telpon']
+        .concat(
+          this.data.map((row) => {
+            return `${row.created_at};${row.fullname};${row.email};${row.no_telpon}`
+          })
+        )
+        .join('\r\n')
+      const status = exportFile('daftar-pengguna-terverifikasi.csv', content, 'text/csv')
+      if (status !== true) {
+        this.$q.notify({
+          message: 'Browser denied file download...',
+          color: 'negative',
+          icon: 'warning'
+        })
+      }
     }
   }
 }

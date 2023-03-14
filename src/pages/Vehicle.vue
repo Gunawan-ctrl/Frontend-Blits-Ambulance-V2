@@ -34,10 +34,10 @@
 
         <q-btn
           flat
-          icon-right="document_scanner"
+          unelevated
+          icon="document_scanner"
           text-color="blue-7"
-          @click="exportTable"
-        >
+          @click="exportToCSV()">
           <q-tooltip>
             Export Data
           </q-tooltip>
@@ -65,6 +65,26 @@
           </div>
         </q-slide-transition>
       </template>
+      <template v-slot:body="props">
+        <q-tr class="text-uppercase" :props="props">
+          <q-td key="plat_id" :props="props">
+            {{ props.row.plat_id }}
+          </q-td>
+          <q-td key="name" :props="props">
+            {{ props.row.name }}
+          </q-td>
+          <q-td class="text-bold" key="device_id" :props="props">
+            {{ props.row.device_id }}
+          </q-td>
+          <q-td class="text-bold" key="device_phone_number" :props="props">
+            {{ props.row.device_phone_number }}
+          </q-td>
+          <q-td class="text-bold" key="status" :props="props">
+            <q-badge color="green">
+              <q-icon name="verified" size="14px" class="q-mr-xs"/> Verified</q-badge>
+          </q-td>
+        </q-tr>
+      </template>
       </q-table>
     </q-card>
     </div>
@@ -74,45 +94,31 @@
 <script>
 import { exportFile } from 'quasar'
 
-function wrapCsvValue (val, formatFn) {
-  let formatted = formatFn !== void 0 ? formatFn(val) : val
-
-  formatted =
-      formatted === void 0 || formatted === null ? '' : String(formatted)
-
-  formatted = formatted.split('"').join('""')
-
-  return `"${formatted}"`
-}
 const columns = [
   {
     name: 'plat_id',
     align: 'left',
     label: 'NO PLAT',
-    field: 'plat_id',
-    sortable: true
+    field: 'plat_id'
   },
   {
     name: 'name',
     required: true,
     label: 'NAMA INSTANSI',
     align: 'left',
-    field: row => row.name,
-    sortable: true
+    field: row => row.name
   },
   {
     name: 'device_id',
     align: 'left',
     label: 'IMEI GPS',
-    field: 'device_id',
-    sortable: true
+    field: 'device_id'
   },
   {
     name: 'device_phone_number',
     align: 'left',
     label: 'NO GPS',
-    field: 'device_phone_number',
-    sortable: true
+    field: 'device_phone_number'
   }
 ]
 
@@ -163,38 +169,15 @@ export default {
           }
         }).catch(() => this.$commonErrorNotif())
     },
-    createKendaraan () {
-      this.$axios.post('', {
-        plat_id: this.plat_id,
-        name: this.name,
-        device_id: this.device_id,
-        device_phone_number: this.device_phone_number
-      }
-        .then((res) => {
-        })
-      )
-    },
-    exportTable () {
-      // naive encoding to csv format
-      const content = [this.columns.map(col => wrapCsvValue(col.label))]
+    exportToCSV () {
+      const content = ['No Plat; Nama Instansi; Imei GPS; No GPS;']
         .concat(
-          this.data.map(row =>
-            this.columns
-              .map(col =>
-                wrapCsvValue(
-                  typeof col.field === 'function'
-                    ? col.field(row)
-                    : row[col.field === void 0 ? col.name : col.field],
-                  col.format
-                )
-              )
-              .join(',')
-          )
+          this.data.map((row) => {
+            return `${row.plat_id};${row.name};${row.device_id};${row.device_phone_number};`
+          })
         )
         .join('\r\n')
-
       const status = exportFile('daftar-ambulans.csv', content, 'text/csv')
-
       if (status !== true) {
         this.$q.notify({
           message: 'Browser denied file download...',
