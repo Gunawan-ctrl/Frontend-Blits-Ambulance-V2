@@ -98,7 +98,7 @@
             </q-slide-transition>
           </template>
           <template v-slot:body="props">
-            <q-tr class="text-uppercase" :props="props" v-if="props.row.verifikasi == 1 && props.row.role == 2">
+            <q-tr class="text-uppercase" :props="props" v-if="props.row.verifikasi == 1">
               <q-td key="tanggal" :props="props">
                 {{ $parseDate(props.row.created_at).fullDate }}
               </q-td>
@@ -165,21 +165,22 @@ export default {
       this.$axios.get('users/get/role-user', createToken())
         .finally(() => this.$q.loading.hide())
         .then((res) => {
+          console.log(res)
           if (res.data.status) {
             this.data = res.data.data
           }
         })
     },
     lihatData () {
-      this.$axios.get('users/getuserbydate/', {
+      this.$axios.get('users/filter/getUserByDate/', {
         params: {
           startDate: this.startDate,
           endDate: this.endDate
         },
         headers: createToken().headers
       })
-      // .finally(() => this.$q.loading.hide())
         .then((res) => {
+          console.log(res)
           if (res.data.status) {
             this.data = res.data.data
           }

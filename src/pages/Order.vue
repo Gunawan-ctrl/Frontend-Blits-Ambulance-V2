@@ -135,7 +135,6 @@ const data = []
 export default {
   data () {
     return {
-      ico: '',
       visibles: false,
       columns,
       data,
@@ -149,7 +148,8 @@ export default {
       mode: 'list',
       pagination: {
         rowsPerPage: 50
-      }
+      },
+      statusPesanan: null
     }
   },
   created () {

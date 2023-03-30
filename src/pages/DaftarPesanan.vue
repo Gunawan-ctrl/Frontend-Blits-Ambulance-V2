@@ -110,10 +110,11 @@
             </q-slide-transition>
           </template>
           <template v-slot:body="props">
-            <q-tr :props="props" v-if="props.row.status_pesanan === 1 || props.row.status_pesanan === 2 || props.row.status_pesanan === 3">
-              <q-td class="text-uppercase" key="nama_driver" :props="props">{{ props.row.data_driver.nama_driver }}</q-td>
+            <q-tr :props="props">
+              <!-- <q-td class="text-uppercase" key="nama_driver" :props="props">{{ props.row.data_driver.nama_driver }}</q-td> -->
+              <q-td class="text-uppercase" key="nama_driver" :props="props">{{props.row.data_driver.nama_driver === undefined ? '-' :(props.row.data_driver.nama_driver)}}</q-td>
               <q-td class="text-weight-bold text-blue-7" key="no_telpon" :props="props"><a target="_blank" style="text-decoration: none;" :href="'https://api.whatsapp.com/send?phone=' + this.telpDriver">
-                {{ props.row.data_driver.no_telpon }}<q-tooltip>CHAT WHATSAPP</q-tooltip></a>
+                {{ props.row.data_driver.no_telpon === undefined ? '-' : (props.row.data_driver.no_telpon) }}<q-tooltip>CHAT WHATSAPP</q-tooltip></a>
               </q-td>
               <q-td class="text-uppercase" key="no_plat" :props="props">{{ props.row.data_driver.no_plat }}</q-td>
               <q-td key="status_pesanan" :props="props"><q-badge :color="(props.row.status_pesanan === 0) ? 'orange-7' :(props.row.status_pesanan === 1) ? 'blue-7' :(props.row.status_pesanan === 2) ? 'teal-7' : 'green-7'">{{`${ (props.row.status_pesanan === 0) ? 'MENUNGGU' :(props.row.status_pesanan === 1) ? 'MENJEMPUT' :(props.row.status_pesanan === 2) ? 'MENGANTAR' : 'SELESAI' }`}}</q-badge>
@@ -158,15 +159,15 @@ export default {
       options: [
         {
           label: 'Menunggu',
-          value: 1
+          value: 0
         },
         {
           label: 'Menjemput',
-          value: 2
+          value: 1
         },
         {
           label: 'Selesai',
-          value: 3
+          value: 2
         }
       ],
       visibles: false,
@@ -210,16 +211,17 @@ export default {
         })
     },
     lihat () {
-      this.$axios.get('pesanan/getpesananbydate/', {
+      this.$axios.get('pesanan/filter/getPesananByDate/', {
         params: {
           startDate: this.startDate,
           endDate: this.endDate,
-          status_pesanan: this.status_pesanan
+          status_pesanan: this.status_pesanan.value
         },
         headers: createToken().headers
       })
         // .finally(() => this.$q.loading.hide())
         .then((res) => {
+          console.log(res)
           if (res.data.status) {
             this.data = res.data.data
           }
