@@ -33,10 +33,6 @@ export default route(function (/* { store, ssrContext } */) {
         next({
           name: 'login'
         })
-        // Notify.create({
-        //   color: 'negative',
-        //   message: 'Maaf anda belum pernah login'
-        // })
       } else {
         next()
       }

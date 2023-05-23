@@ -3,7 +3,12 @@
     <q-card class="q-pa-md q-ma-md">
       <q-breadcrumbs>
         <q-breadcrumbs-el label="Home" icon="home" />
-        <q-breadcrumbs-el class="text-grey-7" label="Pengguna Terverifikasi" icon="verified" />
+        <q-breadcrumbs-el label="Pengguna" icon="supervisor_account" />
+        <q-breadcrumbs-el
+          class="text-grey-7"
+          label="Pengguna Terverifikasi"
+          icon="verified"
+        />
       </q-breadcrumbs>
     </q-card>
     <q-card class="q-px-md q-mx-md">
@@ -33,7 +38,13 @@
               </q-input>
             </div>
             <div>
-              <q-btn size="md" outline class="full-width" color="blue-7" icon="visibility" @click="lihatData" label="lihat data" />
+              <q-btn
+                outline
+                size="md"
+                color="blue-7"
+                @click="lihatData"
+                label="lihat data"
+              />
             </div>
           </div>
         </q-card-section>
@@ -48,7 +59,7 @@
           :columns="columns"
           row-key="name"
           class="text-grey-7"
-          :grid="mode=='grid'"
+          :grid="mode == 'grid'"
           :filter="filter"
           :pagination="pagination"
         >
@@ -69,10 +80,9 @@
               unelevated
               icon="document_scanner"
               text-color="blue-7"
-              @click="exportToCSV()">
-              <q-tooltip>
-                Export Data
-              </q-tooltip>
+              @click="exportToCSV()"
+            >
+              <q-tooltip> Export Data </q-tooltip>
             </q-btn>
 
             <q-btn
@@ -98,7 +108,11 @@
             </q-slide-transition>
           </template>
           <template v-slot:body="props">
-            <q-tr class="text-uppercase" :props="props" v-if="props.row.verifikasi == 1">
+            <q-tr
+              class="text-uppercase"
+              :props="props"
+              v-if="props.row.verifikasi == 1"
+            >
               <q-td key="tanggal" :props="props">
                 {{ $parseDate(props.row.created_at).fullDate }}
               </q-td>
@@ -106,14 +120,18 @@
                 {{ props.row.fullname }}
               </q-td>
               <q-td key="email" :props="props">
-                {{ props.row.email == null ? 'Belum ada email' : props.row.email }}
+                {{
+                  props.row.email == null ? "Belum ada email" : props.row.email
+                }}
               </q-td>
               <q-td class="text-bold" key="no_telpon" :props="props">
                 {{ props.row.no_telpon }}
               </q-td>
               <q-td class="text-bold" key="status" :props="props">
                 <q-badge color="green">
-                  <q-icon name="verified" size="14px" class="q-mr-xs"/> Verified</q-badge>
+                  <q-icon name="verified" size="14px" class="q-mr-xs" />
+                  Verified</q-badge
+                >
               </q-td>
             </q-tr>
           </template>
@@ -123,86 +141,104 @@
   </q-page>
 </template>
 <script>
-import { exportFile } from 'quasar'
-import createToken from 'src/boot/create_token'
+import { exportFile } from "quasar";
+import createToken from "src/boot/create_token";
 
 const columns = [
-  { name: 'tanggal', label: 'TANGGAL', field: 'tanggal', align: 'left' },
-  { name: 'fullname', label: 'Nama Lengkap', field: 'fullname', align: 'left' },
-  { name: 'email', label: 'Email', field: 'email', align: 'center' },
-  { name: 'no_telpon', label: 'No. Telpon', field: 'no_telpon', align: 'center', class: 'text-bold' },
-  { name: 'status', label: 'status', field: 'status', align: 'center', class: 'text-bold' }
-]
+  { name: "tanggal", label: "TANGGAL", field: "tanggal", align: "left" },
+  { name: "fullname", label: "Nama Lengkap", field: "fullname", align: "left" },
+  { name: "email", label: "Email", field: "email", align: "center" },
+  {
+    name: "no_telpon",
+    label: "No. Telpon",
+    field: "no_telpon",
+    align: "center",
+    class: "text-bold",
+  },
+  {
+    name: "status",
+    label: "status",
+    field: "status",
+    align: "center",
+    class: "text-bold",
+  },
+];
 
-const data = []
+const data = [];
 
 export default {
-  data () {
+  data() {
     return {
       visibles: false,
       data,
       rows: [],
-      verified: '',
+      verified: "",
       usersVerified: [],
       columns,
-      filter: '',
+      filter: "",
       created_at: null,
-      mode: 'list',
-      verifikasi: '',
+      mode: "list",
+      verifikasi: "",
       pagination: {
-        rowsPerPage: 10
+        rowsPerPage: 10,
       },
       startDate: null,
-      endDate: null
-    }
+      endDate: null,
+    };
   },
-  async created () {
-    await this.getCustomers()
+  async created() {
+    await this.getCustomers();
   },
   methods: {
-    async getCustomers () {
-      this.$q.loading.show()
-      this.$axios.get('users/get/role-user', createToken())
+    async getCustomers() {
+      this.$q.loading.show();
+      this.$axios
+        .get("users/get/role-user", createToken())
         .finally(() => this.$q.loading.hide())
         .then((res) => {
-          console.log(res)
+          console.log(res);
           if (res.data.status) {
-            this.data = res.data.data
+            this.data = res.data.data;
           }
-        })
+        });
     },
-    lihatData () {
-      this.$axios.get('users/filter/getUserByDate/', {
-        params: {
-          startDate: this.startDate,
-          endDate: this.endDate
-        },
-        headers: createToken().headers
-      })
+    lihatData() {
+      this.$axios
+        .get("users/filter/getUserByDate/", {
+          params: {
+            startDate: this.startDate,
+            endDate: this.endDate,
+          },
+          headers: createToken().headers,
+        })
         .then((res) => {
-          console.log(res)
+          console.log(res);
           if (res.data.status) {
-            this.data = res.data.data
+            this.data = res.data.data;
           }
-        })
+        });
     },
-    exportToCSV () {
-      const content = ['Tanggal; Nama Lengkap; Email; No Telpon']
+    exportToCSV() {
+      const content = ["Tanggal; Nama Lengkap; Email; No Telpon"]
         .concat(
           this.data.map((row) => {
-            return `${row.created_at};${row.fullname};${row.email};${row.no_telpon}`
+            return `${row.created_at};${row.fullname};${row.email};${row.no_telpon}`;
           })
         )
-        .join('\r\n')
-      const status = exportFile('daftar-pengguna-terverifikasi.csv', content, 'text/csv')
+        .join("\r\n");
+      const status = exportFile(
+        "daftar-pengguna-terverifikasi.csv",
+        content,
+        "text/csv"
+      );
       if (status !== true) {
         this.$q.notify({
-          message: 'Browser denied file download...',
-          color: 'negative',
-          icon: 'warning'
-        })
+          message: "Browser denied file download...",
+          color: "negative",
+          icon: "warning",
+        });
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>

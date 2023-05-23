@@ -1,6 +1,66 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <q-page> </q-page>
+  <div style="height: fit-content; width: 100%">
+    <l-map
+      :zoom="map.zoom"
+      :center="map.center"
+      :max-zoom="map.maxZoom"
+      :min-zoom="map.minZoom"
+      style="height: 435px; width: 100%"
+      v-if="map.loaded"
+    >
+      <l-tile-layer :url="map.tileLayer" :attribution="map.attribution" />
+      <l-marker
+        v-for="(d, i) in maps"
+        :key="i"
+        :lat-lng="[Number(d.location_latitude), Number(d.location_longitude)]"
+      >
+        <l-popup>
+          <q-card flat>
+            <q-item>
+              <q-item-section avatar>
+                <q-avatar>
+                  <img src="driver.png" />
+                </q-avatar>
+              </q-item-section>
+
+              <q-item-section>
+                <q-item-label>{{ d.names }}</q-item-label>
+                <q-item-label caption class="text-weight-bold">
+                  {{ d.plats }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-separator />
+
+            <q-card-section horizontal>
+              <q-card-section class="fit">
+                <q-icon name="phone" size="20px" color="blue-7" /> .
+                {{ d.phones }}
+                <q-icon name="alt_route" size="20px" color="blue-7" /> .
+                {{ d.trayeks }}
+              </q-card-section>
+
+              <q-separator vertical />
+
+              <q-card-section class="fit">
+                <q-icon name="local_shipping" size="20px" color="blue-7" />
+                . {{ d.types }}
+                <q-icon name="turn_sharp_right" size="20px" color="blue-7" />
+                . {{ d.kilometerss }} Km
+              </q-card-section>
+            </q-card-section>
+          </q-card>
+        </l-popup>
+        <l-icon
+          :icon-size="[32, 32]"
+          :icon-anchor="[16, 32]"
+          :popup-anchor="[0, -32]"
+          :icon-url="d.icons"
+        />
+      </l-marker>
+    </l-map>
+  </div>
 </template>
 <script>
 import {
@@ -12,13 +72,14 @@ import {
 } from "@vue-leaflet/vue-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+
 export default {
   components: {
-    // LMap,
-    // LIcon,
-    // LTileLayer,
-    // LMarker,
-    // LPopup
+    LMap,
+    LIcon,
+    LTileLayer,
+    LMarker,
+    LPopup,
   },
   data() {
     return {
@@ -41,16 +102,15 @@ export default {
       },
       maps: [],
       zoom: 2,
-      km: 0,
       guid_po: "2bfab8ff-304e-42e9-b200-9fb9140f0432",
     };
   },
-  async created() {
-    await this.getKendaraan();
+  created() {
+    this.getKendaraan();
     this.map.loaded = true;
   },
   methods: {
-    async getKendaraan() {
+    getKendaraan() {
       this.$q.loading.show();
       this.$axios
         .post(
@@ -67,7 +127,9 @@ export default {
         )
         .finally(() => this.$q.loading.hide())
         .then((res) => {
-          if (res.data.status === true) {
+          console.log(res);
+          if (res.data.status) {
+            this.jumlah = res.data.data.length;
             res.data.data.forEach((marker) => {
               marker.location_latitude = marker.location.coordinates[1];
               marker.location_longitude = marker.location.coordinates[0];

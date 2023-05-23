@@ -3,7 +3,11 @@
     <q-card class="q-pa-md q-ma-md">
       <q-breadcrumbs>
         <q-breadcrumbs-el label="Home" icon="home" />
-        <q-breadcrumbs-el class="text-grey-7" label="Dashboard" icon="widgets" />
+        <q-breadcrumbs-el
+          class="text-grey-7"
+          label="Dashboard"
+          icon="widgets"
+        />
       </q-breadcrumbs>
     </q-card>
 
@@ -18,9 +22,7 @@
       >
         <template v-slot:top>
           <div class="col">
-            <div class="col-2 q-table__title">
-              Verifikasi Pengguna Baru
-            </div>
+            <div class="col-2 q-table__title">Verifikasi Pengguna Baru</div>
             <p class="text-caption">
               Daftar pengguna layanan BLITS yang baru terdaftar di sistem
             </p>
@@ -54,13 +56,15 @@
             <q-td key="fullname">
               {{ props.row.fullname }}
               <q-badge color="warning">
-                {{ props.row.verifikasi === 0 ? 'unverified' : 'verified' }}
+                {{ props.row.verifikasi === 0 ? "unverified" : "verified" }}
               </q-badge>
             </q-td>
             <q-td key="email" :props="props">
               <q-item>
                 <q-item-section>
-                  <q-item-label>{{ props.row.email === null ? '-' : 'Belum ada email' }}</q-item-label>
+                  <q-item-label>{{
+                    props.row.email === null ? "-" : "Belum ada email"
+                  }}</q-item-label>
                 </q-item-section>
               </q-item>
             </q-td>
@@ -73,28 +77,53 @@
             </q-td>
             <q-td key="status" :props="props">
               <div class="text-grey-8 q-gutter-xs">
-                <q-badge :color="props.row.role === '1' ? 'orange' :props.row.role === '2' ? 'success' : 'red'">
-                  {{ props.row.role === '3' ? 'Driver' :props.row.role === '2' ? 'Customer' : 'Admins' }}
+                <q-badge
+                  :color="
+                    props.row.role === '1'
+                      ? 'orange'
+                      : props.row.role === '2'
+                      ? 'success'
+                      : 'red'
+                  "
+                >
+                  {{
+                    props.row.role === "3"
+                      ? "Driver"
+                      : props.row.role === "2"
+                      ? "Customer"
+                      : "Admins"
+                  }}
                 </q-badge>
               </div>
             </q-td>
             <q-td class="col q-gutter-sm" key="identitas" :props="props">
-                <q-img
-                  class="rounded-borders"
-                  :ratio="16/9"
-                  style="width:70px"
-                  :src="'https://img.psti-ubl.id/blits/uploads/' + props.row.foto_ktp"
-                />
-                <q-img
-                  class="rounded-borders"
-                  :ratio="16/9"
-                  style="width:70px"
-                  :src="'https://img.psti-ubl.id/blits/uploads/' + props.row.foto_selfie"
-                />
+              <q-img
+                class="rounded-borders"
+                :ratio="16 / 9"
+                style="width: 70px"
+                :src="
+                  'https://img.psti-ubl.id/blits/uploads/' + props.row.foto_ktp
+                "
+              />
+              <q-img
+                class="rounded-borders"
+                :ratio="16 / 9"
+                style="width: 70px"
+                :src="
+                  'https://img.psti-ubl.id/blits/uploads/' +
+                  props.row.foto_selfie
+                "
+              />
             </q-td>
             <q-td key="aksi" :props="props">
               <div class="text-grey-8 q-gutter-xs">
-                <q-btn @click="this.verifyUser(props.row.guid)" dense color="blue-7" class="q-pr-md q-pl-md" size="10px">
+                <q-btn
+                  @click="this.verifyUser(props.row.guid)"
+                  dense
+                  color="blue-7"
+                  class="q-pr-md q-pl-md"
+                  size="10px"
+                >
                   Verified
                 </q-btn>
               </div>
@@ -105,7 +134,12 @@
     </q-card>
 
     <q-dialog v-model="verify">
-      <q-card class="my-card" flat bordered style="width: 650px; max-width: 60vw;">
+      <q-card
+        class="my-card"
+        flat
+        bordered
+        style="width: 650px; max-width: 60vw"
+      >
         <q-item>
           <q-item-section avatar>
             <q-avatar>
@@ -121,7 +155,14 @@
           </q-item-section>
 
           <q-item-section class="col-1">
-            <q-btn flat dense icon="close" class="float-right" color="grey-8" v-close-popup></q-btn>
+            <q-btn
+              flat
+              dense
+              icon="close"
+              class="float-right"
+              color="grey-8"
+              v-close-popup
+            ></q-btn>
           </q-item-section>
         </q-item>
 
@@ -146,8 +187,8 @@
               <q-item-label caption>
                 <q-img
                   class="rounded-borders"
-                  :ratio="16/9"
-                  style="width:270px"
+                  :ratio="16 / 9"
+                  style="width: 270px"
                   :src="'https://img.psti-ubl.id/blits/uploads/' + this.ktp"
                 />
               </q-item-label>
@@ -158,13 +199,13 @@
             <q-item-section>
               <q-item-label>EMAIL</q-item-label>
               <q-item-label caption>
-                {{ this.email == null ? 'Belum ada email' : this.email }}
+                {{ this.email == null ? "Belum ada email" : this.email }}
               </q-item-label>
             </q-item-section>
             <q-item-section>
               <q-item-label>STATUS</q-item-label>
               <q-item-label caption>
-                {{ this.status == 2 ? 'Customer' : '-'}}
+                {{ this.status == 2 ? "Customer" : "-" }}
               </q-item-label>
             </q-item-section>
             <q-item-section>
@@ -172,8 +213,8 @@
               <q-item-label caption>
                 <q-img
                   class="rounded-borders"
-                  :ratio="16/9"
-                  style="width:270px"
+                  :ratio="16 / 9"
+                  style="width: 270px"
                   :src="'https://img.psti-ubl.id/blits/uploads/' + this.selfie"
                 />
               </q-item-label>
@@ -182,77 +223,34 @@
         </q-card-section>
         <q-separator />
         <q-card-actions>
-          <q-btn @click="denied (this.guidVerify)" v-if="this.status === '2'" :disable="this.verifyAct === 1" class="q-pl-md q-pr-md" color="red" flat dense>Tolak</q-btn>
-          <q-btn @click="verified (this.guidVerify)" v-if="this.status === '2'" :disable="this.verifyAct === 1" class="q-pl-md q-pr-md" color="primary" flat dense>Terima</q-btn>
+          <q-btn
+            @click="denied(this.guidVerify)"
+            v-if="this.status === '2'"
+            :disable="this.verifyAct === 1"
+            class="q-pl-md q-pr-md"
+            color="red"
+            flat
+            dense
+            >Tolak</q-btn
+          >
+          <q-btn
+            @click="verified(this.guidVerify)"
+            v-if="this.status === '2'"
+            :disable="this.verifyAct === 1"
+            class="q-pl-md q-pr-md"
+            color="primary"
+            flat
+            dense
+            >Terima</q-btn
+          >
         </q-card-actions>
-
       </q-card>
     </q-dialog>
 
     <div class="row q-col-gutter-md q-ma-xs">
       <div class="col-12 col-md-9 q-pr-md">
         <q-card>
-          <div style="height: fit-content; width: 100%;">
-            <l-map
-              :zoom="map.zoom"
-              :center="map.center"
-              :max-zoom="map.maxZoom"
-              :min-zoom="map.minZoom"
-              style="height: 435px; width: 100%"
-              v-if="map.loaded"
-            >
-              <l-tile-layer
-                :url="map.tileLayer"
-                :attribution="map.attribution"
-              />
-              <l-marker
-                v-for="(d, i) in maps"
-                :key="i"
-                :lat-lng="[Number(d.location_latitude), Number(d.location_longitude)]"
-              >
-              <l-popup>
-                <q-card flat>
-                    <q-item>
-                      <q-item-section avatar>
-                        <q-avatar>
-                          <img src="driver.png">
-                        </q-avatar>
-                      </q-item-section>
-
-                      <q-item-section>
-                        <q-item-label>{{ d.names }}</q-item-label>
-                        <q-item-label caption class="text-weight-bold">
-                          {{ d.plats }}
-                        </q-item-label>
-                      </q-item-section>
-                    </q-item>
-
-                    <q-separator />
-
-                    <q-card-section horizontal>
-                      <q-card-section class="fit">
-                        <q-icon name="phone" size="20px" color="blue-7" /> . {{ d.phones }}
-                        <q-icon name="alt_route" size="20px" color="blue-7" /> . {{ d.trayeks }}
-                      </q-card-section>
-
-                      <q-separator vertical />
-
-                      <q-card-section class="fit">
-                        <q-icon name="local_shipping" size="20px" color="blue-7" /> . {{ d.types }}
-                        <q-icon name="turn_sharp_right" size="20px" color="blue-7" /> . {{ d.kilometerss }} Km
-                      </q-card-section>
-                    </q-card-section>
-                  </q-card>
-              </l-popup>
-              <l-icon
-                :icon-size="[32, 32]"
-                :icon-anchor="[16, 32]"
-                :popup-anchor="[0, -32]"
-                :icon-url="d.icons"
-                />
-              </l-marker>
-            </l-map>
-          </div>
+          <MyMap />
         </q-card>
       </div>
       <div class="col-12 col-md-3 q-gutter-md">
@@ -261,8 +259,15 @@
             <q-card-section class="text-white bg-white">
               <div class="row">
                 <div class="col-8">
-                  <div v-if="jumlah === null || jumlah === undefined" class="text-h4 text-red-7 text-weight-bold">-</div>
-                  <div v-else class="text-h4 text-red-7 text-weight-bold">{{ jumlah }}</div>
+                  <div
+                    v-if="jumlah === null || jumlah === undefined"
+                    class="text-h4 text-red-7 text-weight-bold"
+                  >
+                    -
+                  </div>
+                  <div v-else class="text-h4 text-red-7 text-weight-bold">
+                    {{ jumlah }}
+                  </div>
                   <div class="text-subtitle2 text-blue-7">Ambulans</div>
                   <div class="text-caption text-grey">
                     Jumlah ambulans yang terdaftar.
@@ -280,8 +285,15 @@
             <q-card-section class="text-white bg-white">
               <div class="row">
                 <div class="col-8">
-                  <div v-if="pesanan === null || pesanan === undefined" class="text-h4 text-red-7 text-weight-bold">-</div>
-                  <div v-else class="text-h4 text-red-7 text-weight-bold">{{pesanan}}</div>
+                  <div
+                    v-if="pesanan === null || pesanan === undefined"
+                    class="text-h4 text-red-7 text-weight-bold"
+                  >
+                    -
+                  </div>
+                  <div v-else class="text-h4 text-red-7 text-weight-bold">
+                    {{ pesanan }}
+                  </div>
                   <div class="text-subtitle2 text-blue-7">Pemesan</div>
                   <div class="text-caption text-grey">
                     Jumlah pemesan ambulans terdaftar.
@@ -299,8 +311,15 @@
             <q-card-section class="text-white bg-white">
               <div class="row">
                 <div class="col-8">
-                  <div v-if="pengemudi === null || pengemudi === undefined" class="text-h4 text-red-7 text-weight-bold">-</div>
-                  <div v-else class="text-h4 text-red-7 text-weight-bold">{{ pengemudi }}</div>
+                  <div
+                    v-if="pengemudi === null || pengemudi === undefined"
+                    class="text-h4 text-red-7 text-weight-bold"
+                  >
+                    -
+                  </div>
+                  <div v-else class="text-h4 text-red-7 text-weight-bold">
+                    {{ pengemudi }}
+                  </div>
                   <div class="text-subtitle2 text-blue-7">Pengemudi</div>
                   <div class="text-caption text-grey">
                     Jumlah pengemudi terdaftar.
@@ -319,57 +338,78 @@
 </template>
 
 <script>
-const columns = [
-  { name: 'fullname', label: 'NAMA LENGKAP', field: 'fullname', sortable: true, align: 'left' },
-  { name: 'email', label: 'EMAIL', field: 'email', sortable: true, align: 'center' },
-  { name: 'no_telpon', label: 'NOMOR TELEPON', field: 'no_telpon', sortable: true, align: 'center', class: 'text-bold' },
-  { name: 'status', label: 'STATUS', field: 'status', sortable: true, align: 'center', class: 'text-bold' },
-  { name: 'identitas', label: 'IDENTITAS', field: 'identitas', sortable: true, align: 'left', class: 'text-bold' },
-  { name: 'aksi', label: '', field: 'aksi', sortable: true, align: 'center', class: 'text-bold' }
-]
+import createToken from "src/boot/create_token";
+import MyMap from "./../components/MyMaps.vue";
 
-import createToken from 'src/boot/create_token'
-import { LMap, LIcon, LTileLayer, LMarker, LPopup } from '@vue-leaflet/vue-leaflet'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-// import mqtt from 'mqtt'
+const columns = [
+  {
+    name: "fullname",
+    label: "NAMA LENGKAP",
+    field: "fullname",
+    sortable: true,
+    align: "left",
+  },
+  {
+    name: "email",
+    label: "EMAIL",
+    field: "email",
+    sortable: true,
+    align: "center",
+  },
+  {
+    name: "no_telpon",
+    label: "NOMOR TELEPON",
+    field: "no_telpon",
+    sortable: true,
+    align: "center",
+    class: "text-bold",
+  },
+  {
+    name: "status",
+    label: "STATUS",
+    field: "status",
+    sortable: true,
+    align: "center",
+    class: "text-bold",
+  },
+  {
+    name: "identitas",
+    label: "IDENTITAS",
+    field: "identitas",
+    sortable: true,
+    align: "left",
+    class: "text-bold",
+  },
+  {
+    name: "aksi",
+    label: "",
+    field: "aksi",
+    sortable: true,
+    align: "center",
+    class: "text-bold",
+  },
+];
+
 export default {
   components: {
-    LMap,
-    LIcon,
-    LTileLayer,
-    LMarker,
-    LPopup
+    MyMap,
   },
-  data () {
+  data() {
     return {
       visibles: false,
       columns,
       verify: false,
-      filter: '',
+      filter: "",
       data: [],
       pagination: {
-        rowsPerPage: 10
+        rowsPerPage: 10,
       },
-      map: {
-        loaded: false,
-        tileLayer: 'http://vectormap.pptik.id/styles/klokantech-basic/{z}/{x}/{y}.png',
-        attribution: 'contributors <a href="">BLITS Ambulans</a>',
-        center: L.latLng([-5.422083333333333, 105.25802]),
-        zoom: 12,
-        minZoom: 7,
-        maxZoom: 18,
-        markerLatLng: [47.313220, -1.319482],
-        icons: ''
-      },
-      maps: [],
-      zoom: 2,
       km: 0,
       pengemudi: null,
       pesanan: null,
       jumlah: null,
-      verifikasi: '',
-      guid: '',
+      verifikasi: "",
+      guid: "",
       sample: null,
       fullname: null,
       email: null,
@@ -379,140 +419,154 @@ export default {
       ktp: null,
       guidVerify: null,
       verifyAct: null,
-      guid_po: '2bfab8ff-304e-42e9-b200-9fb9140f0432',
+      guid_po: "2bfab8ff-304e-42e9-b200-9fb9140f0432",
       yourNumber: +6289503251381,
-      yourMessage: 'user telah diverifikasi'
-    }
+      yourMessage: "user telah diverifikasi",
+    };
   },
-  async created () {
-    await this.getKendaraan()
-    await this.getDriver()
-    await this.getPesanan()
-    await this.getCustomers()
-    this.map.loaded = true
+  created() {
+    this.getKendaraan();
+    this.getDriver();
+    this.getPesanan();
+    this.getCustomers();
   },
   methods: {
-    verifyUser (guid) {
-      this.verify = true
-      this.$axios.get(`users/${guid}`, createToken())
-        .then((res) => {
-          if (res.data.status) {
-            this.sample = res.data.data
-            this.fullname = this.sample.fullname
-            this.email = this.sample.email
-            this.phone = this.sample.no_telpon
-            this.status = this.sample.role
-            this.selfie = this.sample.foto_selfie
-            this.ktp = this.sample.foto_ktp
-            this.guidVerify = guid
-            this.verifyAct = this.sample.verifikasi
-          }
-        })
-    },
-    async getKendaraan () {
-      this.$q.loading.show()
-      this.$axios.post('https://api-kopamas-carter.pptik.id:5121/api.v1/vehicles/po-get', {
-        guid_po: this.guid_po
-      }, {
-        headers: {
-          'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJndWlkIjoiNzNhZjk3YjQtNTllZC00MGFmLWJlZTQtOTM4MzhmMzlhNGYzIiwiaWF0IjoxNjY5MTA3MDIyLCJleHAiOjE4MjY3ODcwMjJ9.4x6F8nQyDiMaiARRMOpIV2YkbPrS4iKEEf3Qtm0SjDY'
+    verifyUser(guid) {
+      this.verify = true;
+      this.$axios.get(`users/${guid}`, createToken()).then((res) => {
+        if (res.data.status) {
+          this.sample = res.data.data;
+          this.fullname = this.sample.fullname;
+          this.email = this.sample.email;
+          this.phone = this.sample.no_telpon;
+          this.status = this.sample.role;
+          this.selfie = this.sample.foto_selfie;
+          this.ktp = this.sample.foto_ktp;
+          this.guidVerify = guid;
+          this.verifyAct = this.sample.verifikasi;
         }
-      }).finally(() => this.$q.loading.hide())
+      });
+    },
+    async getKendaraan() {
+      this.$q.loading.show();
+      this.$axios
+        .post(
+          "https://api-kopamas-carter.pptik.id:5121/api.v1/vehicles/po-get",
+          {
+            guid_po: this.guid_po,
+          },
+          {
+            headers: {
+              "x-access-token":
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJndWlkIjoiNzNhZjk3YjQtNTllZC00MGFmLWJlZTQtOTM4MzhmMzlhNGYzIiwiaWF0IjoxNjY5MTA3MDIyLCJleHAiOjE4MjY3ODcwMjJ9.4x6F8nQyDiMaiARRMOpIV2YkbPrS4iKEEf3Qtm0SjDY",
+            },
+          }
+        )
+        .finally(() => this.$q.loading.hide())
         .then((res) => {
           if (res.data.status) {
-            this.jumlah = res.data.data.length
-            res.data.data.forEach((marker) => {
-              marker.location_latitude = marker.location.coordinates[1]
-              marker.location_longitude = marker.location.coordinates[0]
-              marker.names = marker.name
-              marker.plats = marker.plat_id
-              marker.phones = marker.device_phone_number
-              marker.trayeks = marker.trayek
-              marker.types = marker.type
-              this.km = marker.kilometers / 10000
-              marker.kilometerss = Math.round(this.km)
-              marker.icons = 'marker_blue.png'
-              this.maps.push(marker)
+            this.jumlah = res.data.data.length;
+          }
+        })
+        .catch(() => this.$commonErrorNotif());
+    },
+    getDriver() {
+      this.$q.loading.show();
+      this.$axios
+        .get("drivers/get-driver", createToken())
+        .finally(() => this.$q.loading.hide())
+        .then((res) => {
+          if (res.data.status) {
+            this.pengemudi = res.data.data.length;
+          }
+        });
+    },
+    getPesanan() {
+      this.$q.loading.show();
+      this.$axios
+        .get("pesanan/get-pesanan", createToken())
+        .finally(() => this.$q.loading.hide())
+        .then((res) => {
+          if (res.data.status) {
+            this.pesanan = res.data.data.length;
+          }
+        });
+    },
+    getCustomers() {
+      this.$q.loading.show();
+      this.$axios
+        .get("users/get/role-user", createToken())
+        .finally(() => this.$q.loading.hide())
+        .then((res) => {
+          if (res.data.status) {
+            this.data = res.data.data;
+            console.log(this.data);
+          }
+        });
+    },
+    verified(guid) {
+      this.$axios
+        .put(
+          `users/user-update/${guid}`,
+          {
+            verifikasi: 1,
+          },
+          createToken()
+        )
+        .then((res) => {
+          this.$q
+            .dialog({
+              title: "Confirm",
+              message: "apakah anda yakin? ",
+              cancel: true,
+              persistent: true,
             })
-          }
-        }).catch(() => this.$commonErrorNotif())
+            .onOk(() => {
+              this.$router.push({ name: "userVerified" });
+            })
+            .onCancel((err) => {
+              console.log(err);
+            });
+        });
     },
-    getDriver () {
-      this.$q.loading.show()
-      this.$axios.get('drivers/get-driver', createToken())
-        .finally(() => this.$q.loading.hide())
-        .then((res) => {
-          if (res.data.status) {
-            this.pengemudi = res.data.data.length
-          }
-        })
-    },
-    getPesanan () {
-      this.$q.loading.show()
-      this.$axios.get('pesanan/get-pesanan', createToken())
-        .finally(() => this.$q.loading.hide())
-        .then((res) => {
-          if (res.data.status) {
-            this.pesanan = res.data.data.length
-          }
-        })
-    },
-    getCustomers () {
-      this.$q.loading.show()
-      this.$axios.get('users/get/role-user', createToken())
-        .finally(() => this.$q.loading.hide())
-        .then((res) => {
-          if (res.data.status) {
-            this.data = res.data.data
-            console.log(this.data)
-          }
-        })
-    },
-    verified (guid) {
-      this.$axios.put(`users/user-update/${guid}`, {
-        verifikasi: 1
-      }, createToken())
-        .then((res) => {
-          this.$q.dialog({
-            title: 'Confirm',
-            message: 'apakah anda yakin? ',
-            cancel: true,
-            persistent: true
-          }).onOk(() => {
-            this.$router.push({ name: 'userVerified' })
-          }).onCancel((err) => {
-            console.log(err)
-          })
-        })
-    },
-    verifyDetail (guid) {
-      this.$axios.put(`users/get-pesanan/${this.pesanan.guid}`, {
-        fullname: this.fullname,
-        email: this.email,
-        no_telpon: this.no_telpon,
-        alamat: this.alamat
-      }, createToken())
+    verifyDetail(guid) {
+      this.$axios
+        .put(
+          `users/get-pesanan/${this.pesanan.guid}`,
+          {
+            fullname: this.fullname,
+            email: this.email,
+            no_telpon: this.no_telpon,
+            alamat: this.alamat,
+          },
+          createToken()
+        )
         .then((res) => {
           if (res.data.status === true) {
             this.$q.notify({
-              color: 'success',
-              message: 'Data berhasil diubah!'
-            })
-            this.$router.push({ name: 'profil' })
-            this.profile = false
+              color: "success",
+              message: "Data berhasil diubah!",
+            });
+            this.$router.push({ name: "profil" });
+            this.profile = false;
           }
-        })
+        });
     },
-    denied (guid) {
-      this.$axios.put(`users/user-update/${guid}`, {
-        verifikasi: 2
-      }, createToken())
+    denied(guid) {
+      this.$axios
+        .put(
+          `users/user-update/${guid}`,
+          {
+            verifikasi: 2,
+          },
+          createToken()
+        )
         .then((res) => {
           if (res.data.status === true) {
-            this.$router.push({ name: 'userDenied' })
+            this.$router.push({ name: "userDenied" });
           }
-        })
-    }
-  }
-}
+        });
+    },
+  },
+};
 </script>

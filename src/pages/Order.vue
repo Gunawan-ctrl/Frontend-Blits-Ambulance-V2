@@ -4,7 +4,8 @@
     <q-card class="q-pa-md q-ma-md">
       <q-breadcrumbs>
         <q-breadcrumbs-el label="Home" icon="home" />
-        <q-breadcrumbs-el class="text-grey-7" label="Pesanan masuk" icon="perm_phone_msg" />
+        <q-breadcrumbs-el label="Pemesanan" icon="perm_phone_msg" />
+        <q-breadcrumbs-el class="text-grey-7" label="Pesanan Masuk" icon="verified" />
       </q-breadcrumbs>
     </q-card>
     <div class="col q-col-gutter-md q-ma-md q-mt-lg">

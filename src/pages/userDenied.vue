@@ -3,7 +3,12 @@
     <q-card class="q-pa-md q-ma-md">
       <q-breadcrumbs>
         <q-breadcrumbs-el label="Home" icon="home" />
-        <q-breadcrumbs-el class="text-grey-7" label="Pengguna Tertolak" icon="do_disturb" />
+        <q-breadcrumbs-el label="Pengguna" icon="supervisor_account" />
+        <q-breadcrumbs-el
+          class="text-grey-7"
+          label="Pengguna Tertolak"
+          icon="do_disturb"
+        />
       </q-breadcrumbs>
     </q-card>
 
@@ -34,7 +39,13 @@
               </q-input>
             </div>
             <div>
-              <q-btn size="md" outline class="full-width" color="blue-7" icon="visibility" @click="lihatData" label="lihat data" />
+              <q-btn
+                outline
+                size="md"
+                color="blue-7"
+                @click="lihatData"
+                label="lihat data"
+              />
             </div>
           </div>
         </q-card-section>
@@ -49,15 +60,13 @@
           :hide-header="mode === 'grid'"
           :columns="columns"
           row-key="name"
-          :grid="mode=='grid'"
+          :grid="mode == 'grid'"
           :filter="filter"
           :pagination="initialPagination"
         >
           <template v-slot:top>
             <div class="col">
-              <div class="col-2 q-table__title">
-                Data Pengguna Tertolak
-              </div>
+              <div class="col-2 q-table__title">Data Pengguna Tertolak</div>
               <p class="text-caption">
                 Daftar pengguna yang tertolak verifikasi admin
               </p>
@@ -70,10 +79,9 @@
               unelevated
               icon="document_scanner"
               text-color="blue-7"
-              @click="exportToCSV()">
-              <q-tooltip>
-                Export Data
-              </q-tooltip>
+              @click="exportToCSV()"
+            >
+              <q-tooltip> Export Data </q-tooltip>
             </q-btn>
 
             <q-btn
@@ -99,7 +107,11 @@
             </q-slide-transition>
           </template>
           <template v-slot:body="props">
-            <q-tr class="text-uppercase" :props="props" v-if="props.row.verifikasi === 2">
+            <q-tr
+              class="text-uppercase"
+              :props="props"
+              v-if="props.row.verifikasi === 2"
+            >
               <q-td key="tanggal" :props="props">
                 {{ $parseDate(props.row.created_at).fullDate }}
               </q-td>
@@ -107,14 +119,18 @@
                 {{ props.row.fullname }}
               </q-td>
               <q-td key="email" :props="props">
-                {{ props.row.email == null ? 'Belum ada email' : props.row.email }}
+                {{
+                  props.row.email == null ? "Belum ada email" : props.row.email
+                }}
               </q-td>
               <q-td class="text-bold" key="no_telpon" :props="props">
                 {{ props.row.no_telpon }}
               </q-td>
               <q-td class="text-bold" key="status" :props="props">
                 <q-badge color="red">
-                  <q-icon name="do_disturb" size="14px" class="q-mr-xs"/> Denied</q-badge>
+                  <q-icon name="do_disturb" size="14px" class="q-mr-xs" />
+                  Denied</q-badge
+                >
               </q-td>
             </q-tr>
           </template>
@@ -124,85 +140,121 @@
   </q-page>
 </template>
 <script>
-import createToken from 'src/boot/create_token'
-import { exportFile } from 'quasar'
+import createToken from "src/boot/create_token";
+import { exportFile } from "quasar";
 
 const columns = [
-  { name: 'tanggal', label: 'TANGGAL', field: 'tanggal', sortable: true, align: 'left' },
-  { name: 'fullname', label: 'NAMA LENGKAP', field: 'fullname', sortable: true, align: 'left' },
-  { name: 'email', label: 'EMAIL', field: 'email', sortable: true, align: 'center' },
-  { name: 'no_telpon', label: 'NOMOR TELEPON', field: 'no_telpon', sortable: true, align: 'center', class: 'text-bold' },
-  { name: 'status', label: 'STATUS', field: 'status', sortable: true, align: 'center', class: 'text-bold' }
-]
+  {
+    name: "tanggal",
+    label: "TANGGAL",
+    field: "tanggal",
+    sortable: true,
+    align: "left",
+  },
+  {
+    name: "fullname",
+    label: "NAMA LENGKAP",
+    field: "fullname",
+    sortable: true,
+    align: "left",
+  },
+  {
+    name: "email",
+    label: "EMAIL",
+    field: "email",
+    sortable: true,
+    align: "center",
+  },
+  {
+    name: "no_telpon",
+    label: "NOMOR TELEPON",
+    field: "no_telpon",
+    sortable: true,
+    align: "center",
+    class: "text-bold",
+  },
+  {
+    name: "status",
+    label: "STATUS",
+    field: "status",
+    sortable: true,
+    align: "center",
+    class: "text-bold",
+  },
+];
 
 export default {
-  data () {
+  data() {
     return {
       visibles: false,
-      mode: '',
+      mode: "",
       data: [],
       usersDenied: [],
       columns,
       created_at: null,
-      filter: '',
+      filter: "",
       initialPagination: {
-        sortBy: 'desc',
+        sortBy: "desc",
         descending: false,
-        rowsPerPage: 10
+        rowsPerPage: 10,
       },
       startDate: null,
       endDate: null,
-      userverif: null
-    }
+      userverif: null,
+    };
   },
-  async created () {
-    await this.getCustomers()
+  async created() {
+    await this.getCustomers();
   },
   methods: {
-    async getCustomers () {
-      this.$q.loading.show()
-      this.$axios.get('users/get/role-user', createToken())
+    async getCustomers() {
+      this.$q.loading.show();
+      this.$axios
+        .get("users/get/role-user", createToken())
         .finally(() => this.$q.loading.hide())
         .then((res) => {
           if (res.data.status) {
-            this.usersDenied = res.data.data
+            this.usersDenied = res.data.data;
           }
-        })
+        });
     },
-    lihatData () {
-      this.$axios.get('users/getuserbydate/', {
-        params: {
-          startDate: this.startDate,
-          endDate: this.endDate
-        },
-        headers: createToken().headers
-      })
-      // .finally(() => this.$q.loading.hide())
+    lihatData() {
+      this.$axios
+        .get("users/getuserbydate/", {
+          params: {
+            startDate: this.startDate,
+            endDate: this.endDate,
+          },
+          headers: createToken().headers,
+        })
+        // .finally(() => this.$q.loading.hide())
         .then((res) => {
           if (res.data.status) {
-            this.data = res.data.data
+            this.data = res.data.data;
           }
-        })
+        });
     },
-    exportToCSV () {
-      const content = ['Tanggal; Nama Lengkap; Email; No Telpon']
+    exportToCSV() {
+      const content = ["Tanggal; Nama Lengkap; Email; No Telpon"]
         .concat(
           this.usersDenied.map((row) => {
-            return `${row.created_at};${
-              row.fullname
-            };${row.email};${row.no_telpon};`
+            return `${row.created_at};${row.fullname};${row.email};${row.no_telpon};`;
           })
         )
-        .join('\r\n')
-      const status = exportFile('daftar-pengguna-tertolak.csv', content, 'text/csv')
+        .join("\r\n");
+      const status = exportFile(
+        "daftar-pengguna-tertolak.csv",
+        content,
+        "text/csv"
+      );
       if (status !== true) {
         this.$q.notify({
-          message: 'Browser denied file download...',
-          color: 'negative',
-          icon: 'warning'
-        })
+          message: "Browser denied file download...",
+          color: "negative",
+          icon: "warning",
+        });
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>

@@ -11,16 +11,29 @@
           round
         />
         <q-space />
-        <div class="row q-gutter-md q-mr-md">
-
-          <!-- Button notification verifikasi user -->
-          <q-btn round dense flat color="blue-7" icon="mail">
-            <q-badge v-if="totalnotif != 0" color="red" text-color="white" floating>{{ totalnotif }}</q-badge>
+        <div class="row q-gutter-lg">
+          <q-btn
+            round
+            dense
+            flat
+            icon="fa-solid fa-comment-medical"
+            size="sm"
+            class="text-blue-7"
+          >
+            <q-badge
+              v-if="totalnotif != 0"
+              color="red"
+              text-color="white"
+              floating
+              >{{ totalnotif }}</q-badge
+            >
             <q-menu>
               <q-card>
                 <q-card-section>
                   <div class="text-h6 text-grey-7">Informasi Pengguna</div>
-                  <div class="text-subtitle text-grey-7">Daftar informasi pengguna baru belum terverifikasi</div>
+                  <div class="text-subtitle text-grey-7">
+                    Daftar informasi pengguna baru belum terverifikasi
+                  </div>
                   <verifikasi></verifikasi>
                 </q-card-section>
                 <q-separator />
@@ -39,11 +52,21 @@
               </q-card>
             </q-menu>
           </q-btn>
-          <!-- End Button notification verifikasi user -->
 
-          <!-- Button notification pesanan -->
-          <q-btn round dense flat color="blue-7" icon="notifications">
-            <q-badge v-if="pesanan != 0" color="red" text-color="white" floating>
+          <q-btn
+            round
+            dense
+            flat
+            color="blue-7"
+            icon="fa-solid fa-bell"
+            size="sm"
+          >
+            <q-badge
+              v-if="pesanan != 0"
+              color="red"
+              text-color="white"
+              floating
+            >
               {{ pesanan }} {{ notification }}
             </q-badge>
             <q-menu>
@@ -73,16 +96,14 @@
               </q-card>
             </q-menu>
           </q-btn>
-          <!-- End Button notification pesanan -->
-
         </div>
         <div class="row q-gutter-md q-mr-md"></div>
 
         <q-btn-dropdown
           flat
           text-color="blue-7"
-          class="text-capitalize text-subtitle1"
-          :label="this.sapa + dataUser.user.fullname"
+          class="text-weight-bold"
+          label="ADMINISTRATOR"
           left
           stretch
           no-caps
@@ -112,6 +133,7 @@
 
               <div class="text-subtitle1 q-mt-md q-mb-xs text-capitalize">
                 {{ dataUser.user.fullname }}
+                <!-- Gunawan -->
               </div>
 
               <q-btn
@@ -206,9 +228,7 @@
                 <q-item-section avatar>
                   <q-icon name="dashboard" />
                 </q-item-section>
-                <q-item-section>
-                  Dashboard
-                </q-item-section>
+                <q-item-section> Dashboard </q-item-section>
               </q-item>
 
               <q-expansion-item class="q-pl-sm">
@@ -217,9 +237,11 @@
                     <q-icon name="perm_phone_msg" />
                   </q-item-section>
                   <q-item-section> Pemesanan </q-item-section>
-                  <div class="q-gutter-md">
-                    <q-badge v-if="pesanan != 0" rounded color="red">{{ pesanan }}</q-badge>
-                  </div>
+                  <!-- <div class="q-gutter-md">
+                    <q-badge v-if="pesanan != 0" rounded color="red">
+                      {{ pesanan }}
+                    </q-badge>
+                  </div> -->
                 </template>
                 <q-item
                   active-class="tab-active"
@@ -249,6 +271,34 @@
                   <q-item-section> Daftar Pesanan </q-item-section>
                 </q-item>
               </q-expansion-item>
+
+              <q-item
+                active-class="tab-active"
+                :to="{ name: 'vehicle' }"
+                exact
+                class="q-ma-sm navigation-item"
+                clickable
+                v-ripple
+              >
+                <q-item-section avatar>
+                  <q-icon name="local_shipping" />
+                </q-item-section>
+                <q-item-section> Ambulans </q-item-section>
+              </q-item>
+
+              <q-item
+                active-class="tab-active"
+                :to="{ name: 'jenisPesanan' }"
+                exact
+                class="q-ma-sm navigation-item"
+                clickable
+                v-ripple
+              >
+                <q-item-section avatar>
+                  <q-icon name="list_alt" />
+                </q-item-section>
+                <q-item-section> Jenis Pesanan </q-item-section>
+              </q-item>
 
               <q-expansion-item
                 class="q-pl-sm"
@@ -283,46 +333,35 @@
                 </q-item>
               </q-expansion-item>
 
-              <q-item
-                active-class="tab-active"
-                :to="{ name: 'vehicle' }"
-                exact
-                class="q-ma-sm navigation-item"
-                clickable
-                v-ripple
-              >
-                <q-item-section avatar>
-                  <q-icon name="local_shipping" />
-                </q-item-section>
-                <q-item-section> Ambulans </q-item-section>
-              </q-item>
+              <q-expansion-item class="q-pl-sm" icon="badge" label="Petugas">
+                <q-item
+                  active-class="tab-active"
+                  :to="{ name: 'driver' }"
+                  exact
+                  class="q-ma-sm navigation-item"
+                  clickable
+                  v-ripple
+                >
+                  <q-item-section avatar>
+                    <q-icon name="supervised_user_circle" />
+                  </q-item-section>
+                  <q-item-section> Pengemudi </q-item-section>
+                </q-item>
 
-              <q-item
-                active-class="tab-active"
-                :to="{ name: 'driver' }"
-                exact
-                class="q-ma-sm navigation-item"
-                clickable
-                v-ripple
-              >
-                <q-item-section avatar>
-                  <q-icon name="supervised_user_circle" />
-                </q-item-section>
-                <q-item-section> Pengemudi </q-item-section>
-              </q-item>
-
-              <q-item
-                active-class="tab-active"
-                :to="{ name: 'map' }"
-                class="q-ma-sm navigation-item"
-                clickable
-                v-ripple
-              >
-                <q-item-section avatar>
-                  <q-icon name="map" />
-                </q-item-section>
-                <q-item-section> Peta </q-item-section>
-              </q-item>
+                <q-item
+                  active-class="tab-active"
+                  :to="{ name: 'paramedis' }"
+                  exact
+                  class="q-ma-sm navigation-item"
+                  clickable
+                  v-ripple
+                >
+                  <q-item-section avatar>
+                    <q-icon name="medical_services" />
+                  </q-item-section>
+                  <q-item-section> Paramedis </q-item-section>
+                </q-item>
+              </q-expansion-item>
 
               <q-item
                 active-class="tab-active"
@@ -349,107 +388,107 @@
 </template>
 
 <script>
-import createToken from 'src/boot/create_token'
-import Messages from './Messages'
-import Verifikasi from './Verifikasi'
+import createToken from "src/boot/create_token";
+import Messages from "./Messages";
+import Verifikasi from "./Verifikasi";
 
-import mqttjs from 'mqtt'
-let client = null
+import mqttjs from "mqtt";
+let client = null;
 export default {
-  name: 'MainLayout',
+  name: "MainLayout",
   components: {
     Messages,
-    Verifikasi
+    Verifikasi,
   },
-  data () {
+  data() {
     return {
       notification: null,
       leftDrawerOpen: false,
       fullname: null,
       username: null,
-      dataUser: this.$q.localStorage.getItem('dataUser'),
+      dataUser: this.$q.localStorage.getItem("dataUser"),
       confirm: false,
       pesanan: null,
-      sapa: 'Hallo, ',
+      sapa: "Hallo, ",
       totalnotif: null,
       customers: [],
-      data: '',
-      rmqdata: null
-    }
+      data: "",
+      rmqdata: null,
+    };
   },
   beforeCreate: async function () {
     const option = {
-      clientId: 'NotifyOrder',
-      username: '/blits:blits',
-      password: 'I3!tzs2t7',
-      protocolId: '',
+      clientId: "NotifyOrder",
+      username: "/blits:blits",
+      password: "I3!tzs2t7",
+      protocolId: "",
       reconnectPeriode: 0,
-      keepAlive: 0
-    }
+      keepAlive: 0,
+    };
 
-    client = await mqttjs.connect('ws://rmq2.pptik.id:15675/ws', option)
+    client = await mqttjs.connect("ws://rmq2.pptik.id:15675/ws", option);
   },
-  async created () {
-    await this.getPesanan()
-    await this.getCustomers()
-    await this.getMessages()
+  async created() {
+    await this.getPesanan();
+    await this.getCustomers();
+    await this.getMessages();
   },
   methods: {
-    getPesanan () {
-      this.$q.loading.show()
+    getPesanan() {
+      this.$q.loading.show();
       this.$axios
-        .get('pesanan/get-pesanan', createToken())
+        .get("pesanan/get-pesanan", createToken())
         .finally(() => this.$q.loading.hide())
         .then((res) => {
-          this.data = res.data.data
+          this.data = res.data.data;
           const tempRecipes = this.data.filter((item) => {
-            return item.status_pesanan === 0
-          })
-          this.pesanan = tempRecipes.length
-        })
+            return item.status_pesanan === 0;
+          });
+          this.pesanan = tempRecipes.length;
+        });
     },
-    getCustomers () {
-      this.$q.loading.show()
+    getCustomers() {
+      this.$q.loading.show();
       this.$axios
-        .get('users/get/role-user', createToken())
+        .get("users/get/role-user", createToken())
         .finally(() => this.$q.loading.hide())
         .then((res) => {
           if (res.data.status) {
-            this.customers = res.data.data
+            this.customers = res.data.data;
             const totalnotif = this.customers.filter((item) => {
-              return item.verifikasi === 0
-            })
-            this.totalnotif = totalnotif.length
+              return item.verifikasi === 0;
+            });
+            this.totalnotif = totalnotif.length;
           }
-        })
+        });
     },
-    Logout () {
-      this.$q.localStorage.clear()
-      this.$router.push({ name: 'login' })
+    Logout() {
+      this.$q.localStorage.clear();
+      this.$router.push({ name: "login" });
     },
     getMessages: function () {
       const parseData = (data) => {
-        this.notification = data
+        this.notification = data;
         if (data != null) {
-          const audio = new Audio('Notifikasi.mp3')
-          audio.play()
+          const audio = new Audio("Notifikasi.mp3");
+          audio.play();
         }
-      }
+      };
 
-      client.on('connect', function () {
-        client.subscribe('orderan', function (err, topic) {
+      client.on("connect", function () {
+        client.subscribe("orderan", function (err, topic) {
           if (err) {
-            return err
+            return err;
           }
-          client.on('message', function (topic, message) {
-            this.notification = message.toString()
-            parseData(message.toString())
-          })
-        })
-      })
-    }
-  }
-}
+          client.on("message", function (topic, message) {
+            this.notification = message.toString();
+            parseData(message.toString());
+          });
+        });
+      });
+    },
+  },
+};
 </script>
 <style>
 .navigation-item {
