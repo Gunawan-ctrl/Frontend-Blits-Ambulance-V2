@@ -4,7 +4,11 @@
     <q-card class="q-pa-md q-ma-md">
       <q-breadcrumbs>
         <q-breadcrumbs-el label="Home" icon="home" />
-        <q-breadcrumbs-el class="text-grey-7" label="Jenis Pesanan" icon="list_alt" />
+        <q-breadcrumbs-el
+          class="text-grey-7"
+          label="Jenis Pesanan"
+          icon="list_alt"
+        />
       </q-breadcrumbs>
     </q-card>
 
@@ -16,14 +20,13 @@
           :columns="columns"
           row-key="name"
           class="text-grey-7"
-          :grid="mode=='grid'"
+          :grid="mode == 'grid'"
           :filter="filter"
-          :pagination="pagination">
+          :pagination="pagination"
+        >
           <template v-slot:top>
             <div class="col">
-              <div class="col-2 q-table__title">
-                Data Jenis Pesanan
-              </div>
+              <div class="col-2 q-table__title">Data Jenis Pesanan</div>
               <p class="text-caption">
                 Daftar semua jenis pesanan ambulans pada saat ini
               </p>
@@ -31,10 +34,13 @@
 
             <q-space />
 
-            <q-btn @click="new_paramedis=true" flat icon="library_add" text-color="blue-7">
-              <q-tooltip>
-                Tambah Data
-              </q-tooltip>
+            <q-btn
+              @click="dialog = true"
+              flat
+              icon="library_add"
+              text-color="blue-7"
+            >
+              <q-tooltip> Tambah Data </q-tooltip>
             </q-btn>
 
             <q-btn
@@ -42,10 +48,9 @@
               unelevated
               icon="document_scanner"
               text-color="blue-7"
-              @click="exportToCSV()">
-              <q-tooltip>
-                Export Data
-              </q-tooltip>
+              @click="exportToCSV()"
+            >
+              <q-tooltip> Export Data </q-tooltip>
             </q-btn>
 
             <q-btn
@@ -87,8 +92,13 @@
       </q-card>
     </div>
 
-    <q-dialog v-model="new_paramedis">
-      <q-card class="my-card" flat bordered style="width: 600px; max-width: 60vw;">
+    <q-dialog v-model="dialog">
+      <q-card
+        class="my-card"
+        flat
+        bordered
+        style="width: 600px; max-width: 60vw"
+      >
         <q-item>
           <q-item-section avatar>
             <q-avatar>
@@ -104,14 +114,20 @@
           </q-item-section>
 
           <q-item-section class="col-1">
-            <q-btn flat dense icon="close" class="float-right" color="grey-8" v-close-popup></q-btn>
+            <q-btn
+              flat
+              dense
+              icon="close"
+              class="float-right"
+              color="grey-8"
+              v-close-popup
+            ></q-btn>
           </q-item-section>
         </q-item>
 
         <q-separator />
 
         <q-form @submit="InputParamedis()">
-
           <q-card-section horizontal>
             <q-card-section class="q-gutter-xs fit">
               <q-select
@@ -121,7 +137,11 @@
                 v-model="jenisPesanan"
                 :options="optionJenisPesanan"
                 label="Jenis Pesanan"
-                :rules="[ val => val && val.length > 0 || 'data jenis pesanan tidak boleh kosong']"
+                :rules="[
+                  (val) =>
+                    (val && val.length > 0) ||
+                    'data jenis pesanan tidak boleh kosong',
+                ]"
               />
             </q-card-section>
 
@@ -129,11 +149,12 @@
 
             <q-card-section class="q-gutter-xs fit">
               <q-select
-                dense outlined
+                dense
+                outlined
                 v-model="status"
                 :options="optionStatus"
                 label="Status"
-                :rules="[ val => val !== null || 'Status tidak boleh kosong']"
+                :rules="[(val) => val !== null || 'Status tidak boleh kosong']"
               />
             </q-card-section>
           </q-card-section>
@@ -141,9 +162,14 @@
           <q-separator />
 
           <q-card-actions>
-            <q-btn type="submit" flat class="text-weight-bold" label="Simpan" color="primary"/>
+            <q-btn
+              type="submit"
+              flat
+              class="text-weight-bold"
+              label="Simpan"
+              color="primary"
+            />
           </q-card-actions>
-
         </q-form>
       </q-card>
     </q-dialog>
@@ -151,133 +177,125 @@
 </template>
 
 <script>
-import { exportFile } from 'quasar'
-import createToken from 'src/boot/create_token'
+import { exportFile } from "quasar";
+import createToken from "src/boot/create_token";
 
 const columns = [
   {
-    name: 'tanggal',
-    label: 'TANGGAL',
-    field: 'tanggal',
-    align: 'left'
+    name: "tanggal",
+    label: "TANGGAL",
+    field: "tanggal",
+    align: "left",
   },
   {
-    name: 'jenisPesanan',
-    label: 'JENIS PESANAN',
-    field: 'jenisPesanan',
-    align: 'left'
+    name: "jenisPesanan",
+    label: "JENIS PESANAN",
+    field: "jenisPesanan",
+    align: "left",
   },
   {
-    name: 'status',
-    label: 'STATUS',
-    field: 'status',
-    align: 'left'
-  }
-]
-const data = []
+    name: "status",
+    label: "STATUS",
+    field: "status",
+    align: "left",
+  },
+];
+const data = [];
 
 export default {
-  data () {
+  data() {
     return {
       columns,
       visibles: false,
       loading: false,
-      instansi: null,
-      instansi_code: null,
-      app_code: null,
-      nama_paramedis: null,
-      alamat: null,
-      no_telpon: null,
       created_at: null,
       jenisPesanan: null,
-      optionJenisPesanan: ['Kecelakaan', 'Melahirkan', 'Sakit', 'Meninggal'],
+      optionJenisPesanan: ["Kecelakaan", "Melahirkan", "Sakit", "Meninggal"],
       status: null,
-      optionStatus: ['Gawat Darurat', 'Sedang', 'Sangat Darurat'],
+      optionStatus: ["Gawat Darurat", "Sedang", "Sangat Darurat"],
       data,
-      filter: '',
+      filter: "",
       customer: {},
-      new_paramedis: false,
-      mode: 'list',
+      dialog: false,
+      mode: "list",
       pagination: {
-        rowsPerPage: 10
+        rowsPerPage: 10,
       },
-      startDate: null,
-      endDate: null
-    }
+    };
   },
-  created () {
-    this.getData()
+  created() {
+    this.getData();
   },
   methods: {
-    InputParamedis () {
+    InputParamedis() {
       const params = {
-        nama_paramedis: this.nama_paramedis,
-        email: this.email,
-        no_telpon: this.no_telpon,
-        alamat: this.alamat,
-        status_paramedis: this.status.value,
-        instansi_code: this.instansi_code,
-        app_code: this.app_code
-      }
-      this.$axios.post('users/registrasiParamedis', {
-        ...params
-      }, createToken()).then((res) => {
-        if (res.data.status === true) {
-          this.$q.notify({
-            color: 'green',
-            message: res.data.message
-          })
-          this.new_paramedis = false
-          this.getParamedis()
-        } else {
-          this.$q.notify({
-            type: 'error',
-            color: 'red',
-            message: res.data.message
-          })
-        }
-      }).catch((err) => {
-        if (err.response) {
-          this.$errorNotif(err.response.data.message)
-        } else {
-          this.$errorServer()
-        }
-      })
-    },
-    getData () {
-      this.$axios.get('paramedis/getparamedisbydate/', {
-        params: {
-          startDate: this.startDate,
-          endDate: this.endDate
-        },
-        headers: createToken().headers
-      })
+        jenisPesanan: this.jenisPesanan,
+        status: this.status,
+      };
+      this.$axios
+        .post(
+          "users/registrasiJenisPesanan",
+          {
+            ...params,
+          },
+          createToken()
+        )
         .then((res) => {
           if (res.data.status) {
-            this.data = res.data.data
+            this.$q.notify({
+              type: "positive",
+              message: res.data.message,
+            });
+            this.dialog = false;
+            this.getParamedis();
+          } else {
+            this.$q.notify({
+              type: "negative",
+              message: res.data.message,
+            });
           }
         })
+        .catch((err) => {
+          if (err.response) {
+            this.$errorNotif(err.response.data.message);
+          } else {
+            this.$errorServer();
+          }
+        });
     },
-    lihat () {},
-    exportToCSV () {
-      const content = ['Nama Paramedis; Email; No Telpon; Alamat']
+    getData() {
+      this.$axios
+        .get("paramedis/getparamedisbydate/", {
+          params: {
+            startDate: this.startDate,
+            endDate: this.endDate,
+          },
+          headers: createToken().headers,
+        })
+        .then((res) => {
+          if (res.data.status) {
+            this.data = res.data.data;
+          }
+        });
+    },
+    lihat() {},
+    exportToCSV() {
+      const content = ["Nama Paramedis; Email; No Telpon; Alamat"]
         .concat(
           this.data.map((row) => {
-            return `${row.nama_paramedis};${
-              row.email
-            };${row.no_telpon};${row.alamat}`
+            return `${row.nama_paramedis};${row.email};${row.no_telpon};${row.alamat}`;
           })
         )
-        .join('\r\n')
-      const status = exportFile('daftar paramedis.csv', content, 'text/csv')
+        .join("\r\n");
+      const status = exportFile("daftar paramedis.csv", content, "text/csv");
       if (status !== true) {
         this.$q.notify({
-          message: 'Browser denied file download...',
-          color: 'negative',
-          icon: 'warning'
-        })
+          message: "Browser denied file download...",
+          color: "negative",
+          icon: "warning",
+        });
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>

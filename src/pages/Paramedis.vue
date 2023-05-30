@@ -5,7 +5,11 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el label="Home" icon="home" />
         <q-breadcrumbs-el label="Petugas" icon="badge" />
-        <q-breadcrumbs-el class="text-grey-7" label="Paramedis" icon="medical_services" />
+        <q-breadcrumbs-el
+          class="text-grey-7"
+          label="Paramedis"
+          icon="medical_services"
+        />
       </q-breadcrumbs>
     </q-card>
     <!-- <q-card class="q-px-md q-mx-md">
@@ -50,14 +54,13 @@
           :columns="columns"
           row-key="no_plat"
           class="text-grey-7"
-          :grid="mode=='grid'"
+          :grid="mode == 'grid'"
           :filter="filter"
-          :pagination="pagination">
+          :pagination="pagination"
+        >
           <template v-slot:top>
             <div class="col">
-              <div class="col-2 q-table__title">
-                Data Paramedis
-              </div>
+              <div class="col-2 q-table__title">Data Paramedis</div>
               <p class="text-caption">
                 Daftar semua paramedis ambulans pada saat ini
               </p>
@@ -65,10 +68,13 @@
 
             <q-space />
 
-            <q-btn @click="new_paramedis=true" flat icon="library_add" text-color="blue-7">
-              <q-tooltip>
-                Tambah Data
-              </q-tooltip>
+            <q-btn
+              @click="new_paramedis = true"
+              flat
+              icon="library_add"
+              text-color="blue-7"
+            >
+              <q-tooltip> Tambah Data </q-tooltip>
             </q-btn>
 
             <q-btn
@@ -76,10 +82,9 @@
               unelevated
               icon="document_scanner"
               text-color="blue-7"
-              @click="exportToCSV()">
-              <q-tooltip>
-                Export Data
-              </q-tooltip>
+              @click="exportToCSV()"
+            >
+              <q-tooltip> Export Data </q-tooltip>
             </q-btn>
 
             <q-btn
@@ -124,14 +129,15 @@
               <q-td key="alamat" :props="props">
                 {{ props.row.alamat }}
               </q-td>
-              <q-td key="status_paramedis" :props="props">
+              <q-td key="status" :props="props">
                 <q-badge
-                  :color="(props.row.status_paramedis === 0) ? 'green' : 'red'"
+                  :color="props.row.status === 0 ? 'green' : 'red'"
                   text-color="white"
                   dense
                   class="text-weight-bold"
-                  square>
-                  {{ props.row.status_paramedis === 0 ? 'AKTIF' : 'TIDAK AKTIF' }}
+                  square
+                >
+                  {{ props.row.status === 0 ? "AKTIF" : "TIDAK AKTIF" }}
                 </q-badge>
               </q-td>
             </q-tr>
@@ -141,7 +147,12 @@
     </div>
 
     <q-dialog v-model="new_paramedis">
-      <q-card class="my-card" flat bordered style="width: 600px; max-width: 60vw;">
+      <q-card
+        class="my-card"
+        flat
+        bordered
+        style="width: 600px; max-width: 60vw"
+      >
         <q-item>
           <q-item-section avatar>
             <q-avatar>
@@ -157,14 +168,20 @@
           </q-item-section>
 
           <q-item-section class="col-1">
-            <q-btn flat dense icon="close" class="float-right" color="grey-8" v-close-popup></q-btn>
+            <q-btn
+              flat
+              dense
+              icon="close"
+              class="float-right"
+              color="grey-8"
+              v-close-popup
+            ></q-btn>
           </q-item-section>
         </q-item>
 
         <q-separator />
 
         <q-form @submit="InputParamedis()">
-
           <q-card-section horizontal>
             <q-card-section class="q-gutter-xs fit">
               <q-input
@@ -173,7 +190,11 @@
                 outlined
                 v-model="nama_paramedis"
                 label="Nama Paramedis"
-                :rules="[ val => val && val.length > 0 || 'Nama paramedis tidak boleh kosong']"
+                :rules="[
+                  (val) =>
+                    (val && val.length > 0) ||
+                    'Nama paramedis tidak boleh kosong',
+                ]"
               />
               <q-input
                 class="text-capitalize"
@@ -181,14 +202,21 @@
                 outlined
                 v-model="jabatan"
                 label="Jabatan"
-                :rules="[ val => val && val.length > 0 || 'Jabatan tidak boleh kosong']"
+                :rules="[
+                  (val) =>
+                    (val && val.length > 0) || 'Jabatan tidak boleh kosong',
+                ]"
               />
               <q-input
                 dense
                 outlined
                 v-model="no_telpon"
                 label="No Telpon"
-                :rules="[ val => val && val.length > 0 || 'No telpon tidak boleh kosong']" mask="#############"
+                :rules="[
+                  (val) =>
+                    (val && val.length > 0) || 'No telpon tidak boleh kosong',
+                ]"
+                mask="#############"
               />
             </q-card-section>
 
@@ -196,13 +224,14 @@
 
             <q-card-section class="q-gutter-xs fit">
               <q-select
-                dense outlined
+                dense
+                outlined
                 key="value"
                 v-model="status"
                 option-label="label"
                 :options="optionStatus"
                 label="Status"
-                :rules="[ val => val !== null || 'Status tidak boleh kosong']"
+                :rules="[(val) => val !== null || 'Status tidak boleh kosong']"
               />
               <q-input
                 type="email"
@@ -210,7 +239,10 @@
                 outlined
                 v-model="email"
                 label="Email"
-                :rules="[ val => val && val.length > 0 || 'Email tidak boleh kosong']"
+                :rules="[
+                  (val) =>
+                    (val && val.length > 0) || 'Email tidak boleh kosong',
+                ]"
               />
               <q-input
                 class="text-capitalize"
@@ -218,7 +250,10 @@
                 outlined
                 v-model="alamat"
                 label="Alamat"
-                :rules="[ val => val && val.length > 0 || 'Alamat tidak boleh kosong']"
+                :rules="[
+                  (val) =>
+                    (val && val.length > 0) || 'Alamat tidak boleh kosong',
+                ]"
               />
             </q-card-section>
           </q-card-section>
@@ -226,9 +261,14 @@
           <q-separator />
 
           <q-card-actions>
-            <q-btn flat class="text-bold" type="submit" label="Simpan" color="primary"/>
+            <q-btn
+              flat
+              class="text-bold"
+              type="submit"
+              label="Simpan"
+              color="primary"
+            />
           </q-card-actions>
-
         </q-form>
       </q-card>
     </q-dialog>
@@ -236,153 +276,162 @@
 </template>
 
 <script>
-import { exportFile } from 'quasar'
-import createToken from 'src/boot/create_token'
+import { exportFile } from "quasar";
+import createToken from "src/boot/create_token";
 
 const columns = [
   {
-    name: 'tanggal',
-    label: 'TANGGAL',
-    field: 'tanggal',
-    align: 'left'
+    name: "tanggal",
+    label: "TANGGAL",
+    field: "tanggal",
+    align: "left",
   },
   {
-    name: 'nama_paramedis',
-    label: 'NAMA PARAMEDIS',
-    field: 'nama_paramedis',
-    align: 'left'
+    name: "nama_paramedis",
+    label: "NAMA PARAMEDIS",
+    field: "nama_paramedis",
+    align: "left",
   },
   {
-    name: 'email',
-    class: 'text-capitalized',
-    label: 'EMAIL',
-    field: row => row.email,
-    align: 'left'
+    name: "jabatan",
+    label: "JABATAN",
+    field: "jabatan",
+    align: "left",
   },
   {
-    name: 'no_telpon',
+    name: "email",
+    class: "text-capitalized",
+    label: "EMAIL",
+    field: (row) => row.email,
+    align: "left",
+  },
+  {
+    name: "no_telpon",
     required: true,
-    label: 'NO TELPON',
-    field: row => row.no_telpon,
-    align: 'left'
+    label: "NO TELPON",
+    field: (row) => row.no_telpon,
+    align: "left",
   },
   {
-    name: 'alamat',
-    label: 'ALAMAT',
-    field: 'alamat',
-    align: 'left'
+    name: "alamat",
+    label: "ALAMAT",
+    field: "alamat",
+    align: "left",
   },
   {
-    name: 'status_paramedis',
-    label: 'STATUS PARAMEDIS',
-    field: 'status_paramedis',
-    align: 'center'
-  }
-]
-const data = []
+    name: "status",
+    label: "STATUS",
+    field: "status",
+    align: "center",
+  },
+];
+const data = [];
 
 export default {
-  data () {
+  data() {
     return {
       columns,
       visibles: false,
       loading: false,
-      instansi: null,
-      instansi_code: null,
-      app_code: null,
-      nama_paramedis: null,
-      alamat: null,
-      no_telpon: null,
       created_at: null,
+      nama_paramedis: null,
+      jabatan: null,
       email: null,
+      no_telpon: null,
+      alamat: null,
       status: null,
       optionStatus: [
         {
-          label: 'Aktif',
-          value: 0
+          label: "Aktif",
+          value: 0,
         },
         {
-          label: 'Tidak Aktif',
-          value: 3
-        }
+          label: "Tidak Aktif",
+          value: 3,
+        },
       ],
       data,
-      filter: '',
-      customer: {},
+      filter: "",
+      // customer: {},
       new_paramedis: false,
-      mode: 'list',
+      mode: "list",
       pagination: {
-        rowsPerPage: 10
+        rowsPerPage: 10,
       },
       startDate: null,
-      endDate: null
-    }
+      endDate: null,
+    };
   },
-  created () {
-    this.getData()
+  created() {
+    this.getData();
   },
   methods: {
-    InputParamedis () {
+    InputParamedis() {
       const params = {
         nama_paramedis: this.nama_paramedis,
+        jabatan: this.jabatan,
         email: this.email,
         no_telpon: this.no_telpon,
         alamat: this.alamat,
-        status_paramedis: this.status.value
-      }
-      this.$axios.post('users/registrasiParamedis', {
-        ...params
-      }, createToken()).then((res) => {
-        if (res.data.status === true) {
-          this.$q.notify({
-            color: 'green',
-            message: res.data.message
-          })
-          this.new_paramedis = false
-          this.getParamedis()
-        } else {
-          this.$q.notify({
-            type: 'error',
-            color: 'red',
-            message: res.data.message
-          })
-        }
-      })
-    },
-    getData () {
-      this.$axios.get('paramedis/getparamedisbydate/', {
-        params: {
-          startDate: this.startDate,
-          endDate: this.endDate
-        },
-        headers: createToken().headers
-      })
+        status: this.status.value,
+      };
+      this.$axios
+        .post(
+          "users/registrasiParamedis",
+          {
+            ...params,
+          },
+          createToken()
+        )
         .then((res) => {
           if (res.data.status) {
-            this.data = res.data.data
+            this.$q.notify({
+              type: "positive",
+              message: res.data.message,
+            });
+            this.new_paramedis = false;
+            this.getParamedis();
+          } else {
+            this.$q.notify({
+              type: "negative",
+              message: res.data.message,
+            });
           }
-        })
+        });
     },
-    lihat () {},
-    exportToCSV () {
-      const content = ['Nama Paramedis; Email; No Telpon; Alamat']
+    getData() {
+      this.$axios
+        .get("paramedis/getparamedisbydate/", {
+          params: {
+            startDate: this.startDate,
+            endDate: this.endDate,
+          },
+          headers: createToken().headers,
+        })
+        .then((res) => {
+          if (res.data.status) {
+            this.data = res.data.data;
+          }
+        });
+    },
+    lihat() {},
+    exportToCSV() {
+      const content = ["Nama Paramedis; Email; No Telpon; Alamat"]
         .concat(
           this.data.map((row) => {
-            return `${row.nama_paramedis};${
-              row.email
-            };${row.no_telpon};${row.alamat}`
+            return `${row.nama_paramedis};${row.email};${row.no_telpon};${row.alamat}`;
           })
         )
-        .join('\r\n')
-      const status = exportFile('daftar paramedis.csv', content, 'text/csv')
+        .join("\r\n");
+      const status = exportFile("daftar paramedis.csv", content, "text/csv");
       if (status !== true) {
         this.$q.notify({
-          message: 'Browser denied file download...',
-          color: 'negative',
-          icon: 'warning'
-        })
+          message: "Browser denied file download...",
+          color: "negative",
+          icon: "warning",
+        });
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
