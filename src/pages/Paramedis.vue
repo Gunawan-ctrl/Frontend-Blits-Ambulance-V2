@@ -12,39 +12,6 @@
         />
       </q-breadcrumbs>
     </q-card>
-    <!-- <q-card class="q-px-md q-mx-md">
-      <q-form @submit="lihat()">
-        <q-card-section>
-          <div class="row q-col-gutter-lg">
-            <div class="col-md-6 col-sm-6 col-xs-12">
-              <q-input
-                type="date"
-                hint="Tanggal Mulai"
-                v-model="startDate"
-                mask="date"
-                outlined
-                dense
-              >
-              </q-input>
-            </div>
-            <div class="col-md-6 col-sm-6 col-xs-12">
-              <q-input
-                type="date"
-                hint="Tanggal Selesai"
-                v-model="endDate"
-                mask="date"
-                outlined
-                dense
-              >
-              </q-input>
-            </div>
-            <div>
-              <q-btn size="md" outline class="full-width" color="blue-7" icon="visibility" @click="lihat" label="lihat data" />
-            </div>
-          </div>
-        </q-card-section>
-      </q-form>
-    </q-card> -->
 
     <div class="col q-col-gutter-md q-ma-md">
       <q-card>
@@ -69,7 +36,7 @@
             <q-space />
 
             <q-btn
-              @click="new_paramedis = true"
+              @click="dialog = true"
               flat
               icon="library_add"
               text-color="blue-7"
@@ -117,6 +84,9 @@
               <q-td key="nama_paramedis" :props="props">
                 {{ props.row.nama_paramedis }}
               </q-td>
+              <q-td key="nip" :props="props">
+                {{ props.row.nip }}
+              </q-td>
               <q-td key="jabatan" :props="props">
                 {{ props.row.jabatan }}
               </q-td>
@@ -131,14 +101,34 @@
               </q-td>
               <q-td key="status" :props="props">
                 <q-badge
-                  :color="props.row.status === 0 ? 'green' : 'red'"
+                  :color="props.row.status === 'Aktif' ? 'green' : 'red'"
                   text-color="white"
                   dense
                   class="text-weight-bold"
                   square
                 >
-                  {{ props.row.status === 0 ? "AKTIF" : "TIDAK AKTIF" }}
+                  {{ props.row.status === "Aktif" ? "AKTIF" : "TIDAK AKTIF" }}
                 </q-badge>
+              </q-td>
+              <q-td key="action" :props="props">
+                <div class="justify-center q-gutter-x-xs">
+                  <q-btn
+                    flat
+                    color="blue-8"
+                    size="md"
+                    class="q-px-xs"
+                    icon="edit"
+                    @click="openDialog(true, props.row)"
+                  ></q-btn>
+                  <q-btn
+                    flat
+                    color="red"
+                    size="md"
+                    @click="hapusData(props.row.guid)"
+                    class="q-px-xs"
+                    icon="delete"
+                  ></q-btn>
+                </div>
               </q-td>
             </q-tr>
           </template>
@@ -146,7 +136,7 @@
       </q-card>
     </div>
 
-    <q-dialog v-model="new_paramedis">
+    <q-dialog v-model="dialog">
       <q-card
         class="my-card"
         flat
@@ -181,7 +171,7 @@
 
         <q-separator />
 
-        <q-form @submit="InputParamedis()">
+        <q-form @submit="onSubmit()">
           <q-card-section horizontal>
             <q-card-section class="q-gutter-xs fit">
               <q-input
@@ -199,6 +189,17 @@
               <q-input
                 class="text-capitalize"
                 dense
+                type="number"
+                outlined
+                v-model="nip"
+                label="Nip"
+                :rules="[
+                  (val) => (val && val.length > 0) || 'nip tidak boleh kosong',
+                ]"
+              />
+              <q-input
+                class="text-capitalize"
+                dense
                 outlined
                 v-model="jabatan"
                 label="Jabatan"
@@ -207,6 +208,11 @@
                     (val && val.length > 0) || 'Jabatan tidak boleh kosong',
                 ]"
               />
+            </q-card-section>
+
+            <q-separator vertical />
+
+            <q-card-section class="q-gutter-xs fit">
               <q-input
                 dense
                 outlined
@@ -218,15 +224,9 @@
                 ]"
                 mask="#############"
               />
-            </q-card-section>
-
-            <q-separator vertical />
-
-            <q-card-section class="q-gutter-xs fit">
               <q-select
                 dense
                 outlined
-                key="value"
                 v-model="status"
                 option-label="label"
                 :options="optionStatus"
@@ -293,6 +293,12 @@ const columns = [
     align: "left",
   },
   {
+    name: "nip",
+    label: "NIP",
+    field: "nip",
+    align: "left",
+  },
+  {
     name: "jabatan",
     label: "JABATAN",
     field: "jabatan",
@@ -324,6 +330,12 @@ const columns = [
     field: "status",
     align: "center",
   },
+  {
+    name: "action",
+    label: "AKSI",
+    field: "action",
+    align: "center",
+  },
 ];
 const data = [];
 
@@ -335,25 +347,28 @@ export default {
       loading: false,
       created_at: null,
       nama_paramedis: null,
+      nip: null,
       jabatan: null,
       email: null,
       no_telpon: null,
       alamat: null,
       status: null,
-      optionStatus: [
-        {
-          label: "Aktif",
-          value: 0,
-        },
-        {
-          label: "Tidak Aktif",
-          value: 3,
-        },
-      ],
+      optionStatus: ["Aktif", "Tidak Aktif"],
+      // optionStatus: [
+      //   {
+      //     label: "Aktif",
+      //     value: 0,
+      //   },
+      //   {
+      //     label: "Tidak Aktif",
+      //     value: 3,
+      //   },
+      // ],
       data,
       filter: "",
       // customer: {},
-      new_paramedis: false,
+      dialog: false,
+      idActive: null,
       mode: "list",
       pagination: {
         rowsPerPage: 10,
@@ -366,42 +381,138 @@ export default {
     this.getData();
   },
   methods: {
-    InputParamedis() {
-      const params = {
-        nama_paramedis: this.nama_paramedis,
-        jabatan: this.jabatan,
-        email: this.email,
-        no_telpon: this.no_telpon,
-        alamat: this.alamat,
-        status: this.status.value,
-      };
-      this.$axios
-        .post(
-          "users/registrasiParamedis",
-          {
-            ...params,
-          },
-          createToken()
-        )
-        .then((res) => {
-          if (res.data.status) {
-            this.$q.notify({
-              type: "positive",
-              message: res.data.message,
-            });
-            this.new_paramedis = false;
-            this.getParamedis();
-          } else {
-            this.$q.notify({
-              type: "negative",
-              message: res.data.message,
-            });
-          }
-        });
+    openDialog(editMode, data) {
+      this.editMode = editMode;
+      if (editMode) {
+        this.nama_paramedis = data.nama_paramedis;
+        this.nip = data.nip;
+        this.jabatan = data.jabatan;
+        this.email = data.email;
+        this.no_telpon = data.no_telpon;
+        this.alamat = data.alamat;
+        this.status = data.status;
+        this.idActive = data.guid;
+      } else {
+        this.nama_paramedis = null;
+        this.nip = null;
+        this.jabatan = null;
+        this.email = null;
+        this.alamat = null;
+        this.status = null;
+        this.idActive = null;
+      }
+      this.dialog = true;
+    },
+    resetDialog() {
+      this.editMode = false;
+      this.dialog = false;
+    },
+    onReset() {
+      this.jenisPesanan = null;
+      this.status = null;
+    },
+    // InputParamedis() {
+    //   const params = {
+    //     nama_paramedis: this.nama_paramedis,
+    //     nip: this.nip,
+    //     jabatan: this.jabatan,
+    //     email: this.email,
+    //     no_telpon: this.no_telpon,
+    //     alamat: this.alamat,
+    //     status: this.status.value,
+    //   };
+    //   this.$axios
+    //     .post(
+    //       "paramedis/create",
+    //       {
+    //         ...params,
+    //       },
+    //       createToken()
+    //     )
+    //     .then((res) => {
+    //       if (res.data.status) {
+    //         this.$q.notify({
+    //           type: "positive",
+    //           message: res.data.message,
+    //         });
+    //         this.new_paramedis = false;
+    //         this.getParamedis();
+    //       } else {
+    //         this.$q.notify({
+    //           type: "negative",
+    //           message: res.data.message,
+    //         });
+    //       }
+    //     });
+    // },
+    onSubmit() {
+      if (this.editMode) {
+        this.$axios
+          .put(
+            `paramedis/update/${this.idActive}`,
+            {
+              nama_paramedis: this.nama_paramedis,
+              nip: this.nip,
+              jabatan: this.jabatan,
+              email: this.email,
+              no_telpon: this.no_telpon,
+              alamat: this.alamat,
+              status: this.status,
+            },
+            createToken()
+          )
+          .then((res) => {
+            if (res.data.status) {
+              this.$q.notify({
+                type: "positive",
+                message: res.data.message,
+              });
+              this.getData();
+              this.resetDialog();
+              this.onReset();
+            } else {
+              this.$q.notify({
+                type: "negative",
+                message: res.data.message,
+              });
+            }
+          });
+      } else {
+        this.$axios
+          .post(
+            "paramedis/create",
+            {
+              nama_paramedis: this.nama_paramedis,
+              nip: this.nip,
+              jabatan: this.jabatan,
+              email: this.email,
+              no_telpon: this.no_telpon,
+              alamat: this.alamat,
+              status: this.status,
+            },
+            createToken()
+          )
+          .then((res) => {
+            console.log(res);
+            if (res.data.status) {
+              this.$q.notify({
+                type: "positive",
+                message: res.data.message,
+              });
+              this.dialog = false;
+              this.getData();
+            } else {
+              this.$q.notify({
+                type: "negative",
+                message: res.data.message,
+              });
+            }
+          });
+      }
     },
     getData() {
       this.$axios
-        .get("paramedis/getparamedisbydate/", {
+        .get("paramedis/", {
           params: {
             startDate: this.startDate,
             endDate: this.endDate,
@@ -409,6 +520,7 @@ export default {
           headers: createToken().headers,
         })
         .then((res) => {
+          // console.log(res);
           if (res.data.status) {
             this.data = res.data.data;
           }
@@ -431,6 +543,32 @@ export default {
           icon: "warning",
         });
       }
+    },
+    hapusData(guid) {
+      this.$q
+        .dialog({
+          title: "Konfirmasi",
+          message: "Apakah anda yakin ingin menghapus data ini?",
+          cancel: true,
+          persistent: true,
+        })
+        .onOk(() => {
+          this.$axios.delete("paramedis/" + guid, createToken()).then((res) => {
+            console.log(res);
+            if (res.data.status) {
+              this.$q.notify({
+                type: "positive",
+                message: res.data.message,
+              });
+              this.getData();
+            } else {
+              this.$q.notify({
+                type: "negative",
+                message: res.data.message,
+              });
+            }
+          });
+        });
     },
   },
 };

@@ -116,11 +116,13 @@
           </template>
           <template v-slot:body="props">
             <q-tr :props="props">
-              <q-td class="text-uppercase" key="nama_driver" :props="props">{{
-                props.row.data_driver.nama_driver === undefined
-                  ? "-"
-                  : props.row.data_driver.nama_driver
-              }}</q-td>
+              <q-td class="text-uppercase" key="nama_driver" :props="props">
+                {{
+                  props.row.data_driver.nama_driver === undefined
+                    ? "-"
+                    : props.row.data_driver.nama_driver
+                }}
+              </q-td>
               <q-td
                 class="text-weight-bold text-blue-7"
                 key="no_telpon"
@@ -142,6 +144,9 @@
               <q-td class="text-uppercase" key="no_plat" :props="props">{{
                 props.row.data_driver.no_plat
               }}</q-td>
+              <q-td class="text-uppercase" key="nama_paramedis" :props="props"
+                >{{ props.row.data_paramedis.nama_paramedis }}
+              </q-td>
               <q-td key="status_pesanan" :props="props"
                 ><q-badge
                   :color="
@@ -262,6 +267,13 @@ const columns = [
     sortable: true,
   },
   {
+    name: "nama_paramedis",
+    align: "left",
+    label: "PARAMEDIS",
+    field: "nama_paramedis",
+    sortable: true,
+  },
+  {
     name: "status_pesanan",
     align: "left",
     label: "STATUS",
@@ -346,6 +358,7 @@ export default {
   },
   mounted() {
     this.getPesanan();
+    // this.getParamedis();
   },
   methods: {
     getPesanan() {
@@ -354,7 +367,8 @@ export default {
         .get("pesanan/get-pesanan", createToken())
         .finally(() => this.$q.loading.hide())
         .then((res) => {
-          if (res.data.status === true) {
+          console.log(res);
+          if (res.data.status) {
             this.data = res.data.data;
             res.data.data.forEach((phonex) => {
               phonex.phones = phonex.data_user.no_telpon;

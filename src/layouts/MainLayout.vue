@@ -70,7 +70,7 @@
               {{ pesanan }} {{ notification }}
             </q-badge>
             <q-menu>
-              <q-card class="my-card">
+              <q-card>
                 <q-card-section>
                   <div class="text-h6 text-grey-7">Informasi Pesanan</div>
                   <div class="text-subtitle text-grey-7">
@@ -237,11 +237,6 @@
                     <q-icon name="perm_phone_msg" />
                   </q-item-section>
                   <q-item-section> Pemesanan </q-item-section>
-                  <!-- <div class="q-gutter-md">
-                    <q-badge v-if="pesanan != 0" rounded color="red">
-                      {{ pesanan }}
-                    </q-badge>
-                  </div> -->
                 </template>
                 <q-item
                   active-class="tab-active"
@@ -389,8 +384,8 @@
 
 <script>
 import createToken from "src/boot/create_token";
-import Messages from "./Messages";
-import Verifikasi from "./Verifikasi";
+import Messages from "./../components/Messages.vue";
+import Verifikasi from "./../components/Verifikasi.vue";
 
 import mqttjs from "mqtt";
 let client = null;

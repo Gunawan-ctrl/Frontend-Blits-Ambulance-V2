@@ -48,6 +48,11 @@ const routes = [
         component: () => import("pages/PilihDriver.vue"),
       },
       {
+        path: "pilih-paramedis/:guid",
+        name: "pilihParamedis",
+        component: () => import("pages/PilihParamedis.vue"),
+      },
+      {
         path: "daftar-pesanan",
         name: "daftarPesanan",
         component: () => import("pages/DaftarPesanan.vue"),

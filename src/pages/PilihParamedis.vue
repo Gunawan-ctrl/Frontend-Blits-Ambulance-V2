@@ -7,8 +7,8 @@
         <q-breadcrumbs-el label="Pesanan masuk" icon="perm_phone_msg" />
         <q-breadcrumbs-el
           class="text-grey-7"
-          label="Pilih pengemudi"
-          icon="verified"
+          label="Pilih paramedis"
+          icon="medical_services"
         />
       </q-breadcrumbs>
     </q-card>
@@ -24,11 +24,11 @@
         >
           <template v-slot:top>
             <div class="col">
-              <div class="col-2 q-table__title">Pilih Driver</div>
+              <div class="col-2 q-table__title">Pilih Paramedis</div>
               <p class="text-caption">
                 Kode Pemesanan :
                 <span class="text-blue"> {{ kodePesanan }} </span><br />
-                Pilihkan driver yang sedang bertugas dengan status aktif.
+                Pilihkan paramedis yang sedang bertugas sesuai kebutuhan.
               </p>
             </div>
 
@@ -69,46 +69,16 @@
             <q-tr
               class="text-uppercase"
               :props="props"
-              v-if="props.row.status_driver === 0"
+              v-if="props.row.status === 'Aktif'"
             >
-              <q-td key="instansi" :props="props">
-                {{ props.row.instansi }}
+              <q-td key="nama_paramedis" :props="props">
+                {{ props.row.nama_paramedis }}
               </q-td>
-              <q-td key="nama_driver" :props="props">
-                {{ props.row.nama_driver }}
+              <q-td key="nip" :props="props">
+                {{ props.row.nip }}
               </q-td>
-              <q-td class="text-weight-bold" key="no_telpon" :props="props">
-                <a
-                  style="text-decoration: none"
-                  target="_blank"
-                  :href="
-                    'http://https://api.whatsapp.com/send?phone=' + telponDriver
-                  "
-                >
-                  {{ props.row.no_telpon }}<q-tooltip>CHAT WHATSAPP</q-tooltip>
-                </a>
-              </q-td>
-              <q-td key="no_plat" :props="props">
-                {{ props.row.no_plat }}
-              </q-td>
-              <q-td key="status_driver" :props="props">
-                <q-badge
-                  :color="
-                    props.row.status_driver === 0
-                      ? 'green-7'
-                      : props.row.status_driver == 1
-                      ? 'orange-7'
-                      : 'green-7'
-                  "
-                >
-                  {{
-                    props.row.status_driver === 0
-                      ? "SIAP JEMPUT"
-                      : props.row.status_driver === 1
-                      ? "TIDAK AKTIF"
-                      : "SELESAI"
-                  }}
-                </q-badge>
+              <q-td key="jabatan" :props="props">
+                {{ props.row.jabatan }}
               </q-td>
               <q-td key="aksi" :props="props">
                 <div class="justify-center q-gutter-x-xs">
@@ -119,11 +89,8 @@
                     flat
                     size="sm"
                   >
-                    <div>Pilih Driver</div>
+                    <div>Pilih Paramedis</div>
                   </q-btn>
-                  <!-- <q-btn @click="Pilih()" color="blue-7" dense flat size="sm"> -->
-                  <!-- <div>Pilih Driver</div>
-                  </q-btn> -->
                 </div>
               </q-td>
             </q-tr>
@@ -151,33 +118,33 @@ function wrapCsvValue(val, formatFn) {
 
 const columns = [
   {
-    name: "nama_driver",
+    name: "nama_paramedis",
     align: "left",
-    label: "NAMA DRIVER",
-    field: "nama_driver",
+    label: "NAMA PARAMEDIS",
+    field: "nama_paramedis",
     sortable: true,
   },
   {
-    name: "no_telpon",
+    name: "nip",
     align: "left",
-    label: "NOMOR TELEPON",
-    field: "no_telpon",
+    label: "NIP",
+    field: "nip",
     sortable: true,
   },
   {
-    name: "no_plat",
+    name: "jabatan",
     align: "left",
-    label: "NOMOR PLAT",
-    field: "no_plat",
+    label: "JABATAN",
+    field: "jabatan",
     sortable: true,
   },
-  {
-    name: "status_driver",
-    align: "left",
-    label: "STATUS DRIVER",
-    field: "status_driver",
-    sortable: true,
-  },
+  // {
+  //   name: "no_telpon",
+  //   align: "left",
+  //   label: "NO TELPON",
+  //   field: "no_telpon",
+  //   sortable: true,
+  // },
   { name: "aksi", align: "center", label: "", field: "aksi", sortable: true },
 ];
 
@@ -198,6 +165,13 @@ export default {
       guid: "",
       pilih: "",
       driver: "",
+      nip: "",
+      nama_paramedis: "",
+      jabatan: "",
+      email: "",
+      // no_telpon: "",
+      alamat: "",
+      status: "",
       filter: "",
       pagination: {
         rowsPerPage: 10,
@@ -205,23 +179,18 @@ export default {
     };
   },
   created() {
-    this.getDriver();
+    this.getParamedis();
     this.getidPesanan();
   },
   methods: {
-    getDriver() {
+    getParamedis() {
       this.$q.loading.show();
       this.$axios
-        .get("drivers/get-driver", createToken())
+        .get("paramedis/", createToken())
         .finally(() => this.$q.loading.hide())
         .then((res) => {
           if (res.data.status) {
             this.data = res.data.data;
-            res.data.data.forEach((telpon) => {
-              telpon = telpon.no_telpon.replace("0", "62");
-              this.telponDriver = telpon;
-              console.log(res.data);
-            });
           }
         })
         .catch(() => this.$commonErrorNotif());
@@ -230,7 +199,7 @@ export default {
       this.$axios
         .get(`pesanan/${this.$route.params.guid}`, createToken())
         .then((res) => {
-          if (res.data.status === true) {
+          if (res.data.status) {
             this.kodePesanan = res.data.data[0].kode_pesanan;
           }
         });
@@ -240,20 +209,16 @@ export default {
         .put(
           `pesanan/update-pesanan/${Pesanan}`,
           {
-            status_pesanan: 1,
-            status_driver: 1,
-            guid_driver: guid,
+            status: "Tidak Aktif",
+            guid_paramedis: guid,
           },
           createToken()
         )
         .then((res) => {
-          this.$router.push({ name: "pilihParamedis" });
-          // this.$router.push({ name: "pilihParamedis/" + Pesanan });
+          console.log(res);
+          this.$router.push({ name: "daftarPesanan" });
         });
     },
-    // Pilih() {
-    //   this.$router.push({ name: "pilihParamedis" });
-    // },
     exportTable() {
       // naive encoding to csv format
       const content = [this.columns.map((col) => wrapCsvValue(col.label))]
@@ -286,4 +251,3 @@ export default {
   },
 };
 </script>
-<style></style>
