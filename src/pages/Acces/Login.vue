@@ -101,7 +101,6 @@
   </q-layout>
 </template>
 
-<script type="text/javascript"></script>
 <script>
 export default {
   data() {
@@ -126,8 +125,7 @@ export default {
           password: this.password,
         })
         .then((res) => {
-          console.log(res);
-          if (res.data.status === true) {
+          if (res.data.status) {
             this.$q.localStorage.set("dataUser", res.data.data);
             if (res.data.data.user.role === "1") {
               this.$router.push({ name: "dashboard" });

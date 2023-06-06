@@ -196,7 +196,6 @@ export default {
         .get("users/get/role-user", createToken())
         .finally(() => this.$q.loading.hide())
         .then((res) => {
-          console.log(res);
           if (res.data.status) {
             this.data = res.data.data;
           }
@@ -212,7 +211,6 @@ export default {
           headers: createToken().headers,
         })
         .then((res) => {
-          console.log(res);
           if (res.data.status) {
             this.data = res.data.data;
           }

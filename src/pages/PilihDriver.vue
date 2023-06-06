@@ -220,7 +220,6 @@ export default {
             res.data.data.forEach((telpon) => {
               telpon = telpon.no_telpon.replace("0", "62");
               this.telponDriver = telpon;
-              console.log(res.data);
             });
           }
         })

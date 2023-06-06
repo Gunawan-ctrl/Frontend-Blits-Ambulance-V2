@@ -37,7 +37,6 @@ export default {
         .then((res) => {
           if (res.data.status) {
             this.customers = res.data.data;
-            console.log(this.customers);
           }
         });
     },

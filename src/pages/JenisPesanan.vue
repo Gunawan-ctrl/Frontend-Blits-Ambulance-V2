@@ -35,7 +35,7 @@
             <q-space />
 
             <q-btn
-              @click="dialog = true"
+              @click="openDialog(false, null)"
               flat
               icon="library_add"
               text-color="blue-7"
@@ -232,7 +232,7 @@ const columns = [
   },
   {
     name: "status",
-    label: "STATUS",
+    label: "PARAMEDIS",
     field: "status",
     align: "left",
   },

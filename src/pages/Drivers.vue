@@ -454,9 +454,7 @@ export default {
           },
           headers: createToken().headers,
         })
-        // .finally(() => this.$q.loading.hide())
         .then((res) => {
-          console.log(res);
           if (res.data.status) {
             this.data = res.data.data;
           }

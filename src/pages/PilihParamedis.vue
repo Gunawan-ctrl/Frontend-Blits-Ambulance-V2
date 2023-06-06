@@ -215,7 +215,6 @@ export default {
           createToken()
         )
         .then((res) => {
-          console.log(res);
           this.$router.push({ name: "daftarPesanan" });
         });
     },

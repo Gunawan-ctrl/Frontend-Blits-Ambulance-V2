@@ -127,7 +127,6 @@ export default {
         )
         .finally(() => this.$q.loading.hide())
         .then((res) => {
-          console.log(res);
           if (res.data.status) {
             this.jumlah = res.data.data.length;
             res.data.data.forEach((marker) => {

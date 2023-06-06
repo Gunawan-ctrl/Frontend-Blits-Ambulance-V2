@@ -36,7 +36,7 @@
             <q-space />
 
             <q-btn
-              @click="dialog = true"
+              @click="openDialog(false, null)"
               flat
               icon="library_add"
               text-color="blue-7"
@@ -397,6 +397,7 @@ export default {
         this.nip = null;
         this.jabatan = null;
         this.email = null;
+        this.no_telpon = null;
         this.alamat = null;
         this.status = null;
         this.idActive = null;
@@ -411,40 +412,6 @@ export default {
       this.jenisPesanan = null;
       this.status = null;
     },
-    // InputParamedis() {
-    //   const params = {
-    //     nama_paramedis: this.nama_paramedis,
-    //     nip: this.nip,
-    //     jabatan: this.jabatan,
-    //     email: this.email,
-    //     no_telpon: this.no_telpon,
-    //     alamat: this.alamat,
-    //     status: this.status.value,
-    //   };
-    //   this.$axios
-    //     .post(
-    //       "paramedis/create",
-    //       {
-    //         ...params,
-    //       },
-    //       createToken()
-    //     )
-    //     .then((res) => {
-    //       if (res.data.status) {
-    //         this.$q.notify({
-    //           type: "positive",
-    //           message: res.data.message,
-    //         });
-    //         this.new_paramedis = false;
-    //         this.getParamedis();
-    //       } else {
-    //         this.$q.notify({
-    //           type: "negative",
-    //           message: res.data.message,
-    //         });
-    //       }
-    //     });
-    // },
     onSubmit() {
       if (this.editMode) {
         this.$axios
@@ -493,7 +460,6 @@ export default {
             createToken()
           )
           .then((res) => {
-            console.log(res);
             if (res.data.status) {
               this.$q.notify({
                 type: "positive",
@@ -520,7 +486,6 @@ export default {
           headers: createToken().headers,
         })
         .then((res) => {
-          // console.log(res);
           if (res.data.status) {
             this.data = res.data.data;
           }
@@ -554,7 +519,6 @@ export default {
         })
         .onOk(() => {
           this.$axios.delete("paramedis/" + guid, createToken()).then((res) => {
-            console.log(res);
             if (res.data.status) {
               this.$q.notify({
                 type: "positive",

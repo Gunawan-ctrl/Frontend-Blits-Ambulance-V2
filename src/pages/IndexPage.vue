@@ -464,7 +464,6 @@ export default {
         )
         .finally(() => this.$q.loading.hide())
         .then((res) => {
-          console.log(res);
           if (res.data.status) {
             this.jumlah = res.data.data.length;
           }
@@ -501,7 +500,6 @@ export default {
         .then((res) => {
           if (res.data.status) {
             this.data = res.data.data;
-            console.log(this.data);
           }
         });
     },
