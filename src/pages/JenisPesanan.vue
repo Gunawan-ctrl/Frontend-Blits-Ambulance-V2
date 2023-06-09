@@ -85,13 +85,7 @@
               </q-td>
               <q-td key="status" :props="props">
                 <q-badge
-                  :color="
-                    props.row.status === '0'
-                      ? 'red'
-                      : props.row.status === '1'
-                      ? 'orange'
-                      : 'green'
-                  "
+                  :color="props.row.status === 'Ya' ? 'green' : 'red'"
                   text-color="white"
                   dense
                   class="text-weight-bold"

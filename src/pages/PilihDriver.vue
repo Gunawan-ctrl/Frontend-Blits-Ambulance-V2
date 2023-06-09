@@ -121,9 +121,17 @@
                   >
                     <div>Pilih Driver</div>
                   </q-btn>
-                  <!-- <q-btn @click="Pilih()" color="blue-7" dense flat size="sm"> -->
-                  <!-- <div>Pilih Driver</div>
-                  </q-btn> -->
+                  <q-btn
+                    v-if="jenisPesanan === 'Sakit'"
+                    @click="Medis(props.row.guid, this.$route.params.guid)"
+                    color="blue-7"
+                    dense
+                    flat
+                    disable
+                    size="sm"
+                  >
+                    <div>Pilih Paramedis</div>
+                  </q-btn>
                 </div>
               </q-td>
             </q-tr>
@@ -193,6 +201,7 @@ export default {
       Pesanan: "",
       status_pesanan: "",
       kodePesanan: "",
+      jenisPesanan: "",
       status_driver: "",
       telponDriver: "",
       guid: "",
@@ -229,8 +238,10 @@ export default {
       this.$axios
         .get(`pesanan/${this.$route.params.guid}`, createToken())
         .then((res) => {
-          if (res.data.status === true) {
+          if (res.data.status) {
             this.kodePesanan = res.data.data[0].kode_pesanan;
+            this.status = res.data.data[0].jenis_pesanan.status;
+            console.log(this.status);
           }
         });
     },
@@ -246,13 +257,13 @@ export default {
           createToken()
         )
         .then((res) => {
-          this.$router.push({ name: "pilihParamedis" });
-          // this.$router.push({ name: "pilihParamedis/" + Pesanan });
+          if (this.status === "Ya") {
+            this.$router.push({ name: "pilihParamedis" });
+          } else {
+            this.$router.push({ name: "daftarPesanan" });
+          }
         });
     },
-    // Pilih() {
-    //   this.$router.push({ name: "pilihParamedis" });
-    // },
     exportTable() {
       // naive encoding to csv format
       const content = [this.columns.map((col) => wrapCsvValue(col.label))]

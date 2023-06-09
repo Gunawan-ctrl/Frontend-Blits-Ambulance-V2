@@ -486,6 +486,7 @@ export default {
           headers: createToken().headers,
         })
         .then((res) => {
+          console.log(res);
           if (res.data.status) {
             this.data = res.data.data;
           }

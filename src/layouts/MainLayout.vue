@@ -21,7 +21,7 @@
             class="text-blue-7"
           >
             <q-badge
-              v-if="totalnotif != 0"
+              v-if="totalnotif"
               color="red"
               text-color="white"
               floating
@@ -62,12 +62,12 @@
             size="sm"
           >
             <q-badge
-              v-if="pesanan != 0"
+              v-if="pesanan != undefined"
               color="red"
               text-color="white"
               floating
             >
-              {{ pesanan }} {{ notification }}
+              {{ pesanan }}
             </q-badge>
             <q-menu>
               <q-card>
@@ -133,7 +133,6 @@
 
               <div class="text-subtitle1 q-mt-md q-mb-xs text-capitalize">
                 {{ dataUser.user.fullname }}
-                <!-- Gunawan -->
               </div>
 
               <q-btn
@@ -295,6 +294,36 @@
                 <q-item-section> Jenis Pesanan </q-item-section>
               </q-item>
 
+              <q-expansion-item class="q-pl-sm" icon="badge" label="Petugas">
+                <q-item
+                  active-class="tab-active"
+                  :to="{ name: 'driver' }"
+                  exact
+                  class="q-ma-sm navigation-item"
+                  clickable
+                  v-ripple
+                >
+                  <q-item-section avatar>
+                    <q-icon name="supervised_user_circle" />
+                  </q-item-section>
+                  <q-item-section> Pengemudi </q-item-section>
+                </q-item>
+
+                <q-item
+                  active-class="tab-active"
+                  :to="{ name: 'paramedis' }"
+                  exact
+                  class="q-ma-sm navigation-item"
+                  clickable
+                  v-ripple
+                >
+                  <q-item-section avatar>
+                    <q-icon name="medical_services" />
+                  </q-item-section>
+                  <q-item-section> Paramedis </q-item-section>
+                </q-item>
+              </q-expansion-item>
+
               <q-expansion-item
                 class="q-pl-sm"
                 icon="supervisor_account"
@@ -325,36 +354,6 @@
                     <q-icon name="do_disturb" />
                   </q-item-section>
                   <q-item-section> Tertolak </q-item-section>
-                </q-item>
-              </q-expansion-item>
-
-              <q-expansion-item class="q-pl-sm" icon="badge" label="Petugas">
-                <q-item
-                  active-class="tab-active"
-                  :to="{ name: 'driver' }"
-                  exact
-                  class="q-ma-sm navigation-item"
-                  clickable
-                  v-ripple
-                >
-                  <q-item-section avatar>
-                    <q-icon name="supervised_user_circle" />
-                  </q-item-section>
-                  <q-item-section> Pengemudi </q-item-section>
-                </q-item>
-
-                <q-item
-                  active-class="tab-active"
-                  :to="{ name: 'paramedis' }"
-                  exact
-                  class="q-ma-sm navigation-item"
-                  clickable
-                  v-ripple
-                >
-                  <q-item-section avatar>
-                    <q-icon name="medical_services" />
-                  </q-item-section>
-                  <q-item-section> Paramedis </q-item-section>
                 </q-item>
               </q-expansion-item>
 
@@ -413,18 +412,24 @@ export default {
   },
   beforeCreate: async function () {
     const option = {
+      // clientId: "NotifyOrder",
+      // username: "/blits:blits",
+      // password: "I3!tzs2t7",
+      // protocolId: "",
+      // reconnectPeriode: 0,
+      // keepAlive: 0,
       clientId: "NotifyOrder",
-      username: "/blits:blits",
-      password: "I3!tzs2t7",
+      username: "/blits_ambulance:blits",
+      password: "blits123abc45",
       protocolId: "",
       reconnectPeriode: 0,
       keepAlive: 0,
     };
 
-    client = await mqttjs.connect("ws://rmq2.pptik.id:15675/ws", option);
+    client = await mqttjs.connect("ws://103.167.112.188:15675/ws", option);
   },
   async created() {
-    await this.getPesanan();
+    // await this.getPesanan();
     await this.getCustomers();
     await this.getMessages();
   },
@@ -440,6 +445,7 @@ export default {
             return item.status_pesanan === 0;
           });
           this.pesanan = tempRecipes.length;
+          console.log(this.pesanan);
         });
     },
     getCustomers() {
@@ -462,11 +468,14 @@ export default {
       this.$router.push({ name: "login" });
     },
     getMessages: function () {
+      // console.log(this.pesanan);
       const parseData = (data) => {
+        // console.log(data);
         this.notification = data;
         if (data != null) {
           const audio = new Audio("Notifikasi.mp3");
           audio.play();
+          this.getPesanan();
         }
       };
 
@@ -475,8 +484,10 @@ export default {
           if (err) {
             return err;
           }
+          // console.log("aaa");
           client.on("message", function (topic, message) {
-            this.notification = message.toString();
+            // console.log("!ewwq");
+            // this.notification = message.toString();
             parseData(message.toString());
           });
         });

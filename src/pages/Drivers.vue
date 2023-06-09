@@ -351,18 +351,6 @@ const columns = [
     align: "left",
   },
   {
-    name: "instansi_code",
-    label: "INSTANSI KODE",
-    field: (row) => row.data_user.instansi_code,
-    align: "left",
-  },
-  // {
-  //   name: 'app_code',
-  //   label: 'APP KODE',
-  //   field: row => row.data_user.app_code,
-  //   align: 'left'
-  // },
-  {
     name: "status_driver",
     label: "STATUS DRIVER",
     field: "status_driver",
@@ -416,6 +404,7 @@ export default {
   created() {
     this.getData();
     this.getKendaraan();
+    this.getDriver();
   },
   methods: {
     getData() {
@@ -424,28 +413,10 @@ export default {
         filter: this.nama,
       });
     },
-    exportToCSV() {
-      const content = ["Nama Pengemudi; Email; No Telpon; No Plat; Alamat"]
-        .concat(
-          this.data.map((row) => {
-            return `${row.nama_driver};${row.data_user.email};${row.no_telpon};${row.no_plat};${row.alamat}`;
-          })
-        )
-        .join("\r\n");
-      const status = exportFile("daftar pengemudi.csv", content, "text/csv");
-      if (status !== true) {
-        this.$q.notify({
-          message: "Browser denied file download...",
-          color: "negative",
-          icon: "warning",
-        });
-      }
-    },
     onRequest() {
       this.lihat();
     },
     lihat() {
-      // this.$q.loading.show()
       this.$axios
         .get("drivers/getdriverbydate/", {
           params: {
@@ -477,6 +448,13 @@ export default {
           this.listPlat = res.data.data;
         });
     },
+    getDriver() {
+      this.$axios.get("drivers/get-driver", createToken()).then((res) => {
+        if (res.data.status) {
+          this.data = res.data.data;
+        }
+      });
+    },
     InputDriver() {
       const params = {
         no_plat: this.no_plat.plat_id,
@@ -485,8 +463,6 @@ export default {
         no_telpon: this.no_telpon,
         alamat: this.alamat,
         status_driver: this.status.value,
-        // instansi_code: this.instansi_code,
-        // app_code: this.app_code
       };
       this.$axios
         .post(
@@ -497,7 +473,7 @@ export default {
           createToken()
         )
         .then((res) => {
-          if (res.data.status === true) {
+          if (res.data.status) {
             this.$q.notify({
               color: "green",
               message: res.data.message,
@@ -512,6 +488,23 @@ export default {
             });
           }
         });
+    },
+    exportToCSV() {
+      const content = ["Nama Pengemudi; Email; No Telpon; No Plat; Alamat"]
+        .concat(
+          this.data.map((row) => {
+            return `${row.nama_driver};${row.data_user.email};${row.no_telpon};${row.no_plat};${row.alamat}`;
+          })
+        )
+        .join("\r\n");
+      const status = exportFile("daftar pengemudi.csv", content, "text/csv");
+      if (status !== true) {
+        this.$q.notify({
+          message: "Browser denied file download...",
+          color: "negative",
+          icon: "warning",
+        });
+      }
     },
   },
 };

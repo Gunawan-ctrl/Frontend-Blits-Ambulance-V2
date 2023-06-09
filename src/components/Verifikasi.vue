@@ -18,8 +18,7 @@
 <script>
 import createToken from "src/boot/create_token";
 export default {
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: "Verifikasi",
+  name: "VerifikasiPage",
   data() {
     return {
       customers: [],

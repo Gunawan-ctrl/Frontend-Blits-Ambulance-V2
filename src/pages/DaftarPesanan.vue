@@ -144,8 +144,26 @@
               <q-td class="text-uppercase" key="no_plat" :props="props">{{
                 props.row.data_driver.no_plat
               }}</q-td>
-              <q-td class="text-uppercase" key="nama_paramedis" :props="props"
-                >{{ props.row.data_paramedis.nama_paramedis }}
+              <q-td class="text-uppercase" key="nama_paramedis" :props="props">
+                <!-- <q-badge
+                  :color="
+                    props.row.data_paramedis === undefined || null
+                      ? 'green'
+                      : 'orange'
+                  "
+                  >{{
+                    `${
+                      props.row.data_paramedis === undefined || null
+                        ? "Tidak Ada"
+                        : props.row.data_paramedis.nama_paramedis
+                    }`
+                  }}</q-badge
+                > -->
+                {{
+                  props.row.data_paramedis === undefined || null
+                    ? "-"
+                    : props.row.data_paramedis.nama_paramedis
+                }}
               </q-td>
               <q-td key="status_pesanan" :props="props"
                 ><q-badge
@@ -268,7 +286,7 @@ const columns = [
   },
   {
     name: "nama_paramedis",
-    align: "left",
+    align: "center",
     label: "PARAMEDIS",
     field: "nama_paramedis",
     sortable: true,

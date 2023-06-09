@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 420px" v-for="(d, i) in dataInformasi" :key="i">
+  <div style="max-width: 360px" v-for="(d, i) in dataInformasi" :key="i">
     <q-item v-if="d.status_pesanan === 0">
       <q-item-section top avatar>
         <q-avatar>
