@@ -259,7 +259,6 @@ export default {
         .get("pesanan/get-pesanan", createToken())
         .finally(() => this.$q.loading.hide())
         .then((res) => {
-          console.log(res);
           this.data = res.data.data;
           res.data.data.forEach((phonex) => {
             this.kodePesanan = phonex.kode_pesanan;

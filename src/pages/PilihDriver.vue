@@ -241,7 +241,6 @@ export default {
           if (res.data.status) {
             this.kodePesanan = res.data.data[0].kode_pesanan;
             this.status = res.data.data[0].jenis_pesanan.status;
-            console.log(this.status);
           }
         });
     },

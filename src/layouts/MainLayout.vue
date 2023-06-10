@@ -445,7 +445,6 @@ export default {
             return item.status_pesanan === 0;
           });
           this.pesanan = tempRecipes.length;
-          console.log(this.pesanan);
         });
     },
     getCustomers() {
@@ -468,9 +467,7 @@ export default {
       this.$router.push({ name: "login" });
     },
     getMessages: function () {
-      // console.log(this.pesanan);
       const parseData = (data) => {
-        // console.log(data);
         this.notification = data;
         if (data != null) {
           const audio = new Audio("Notifikasi.mp3");
@@ -484,10 +481,7 @@ export default {
           if (err) {
             return err;
           }
-          // console.log("aaa");
           client.on("message", function (topic, message) {
-            // console.log("!ewwq");
-            // this.notification = message.toString();
             parseData(message.toString());
           });
         });
